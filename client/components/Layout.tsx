@@ -1,14 +1,14 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import LogoutButton from './LogoutButton.tsx'
-import logo from '../../Image/logo.png'
+import logo from '../../Image/MoneyTrackerLogo.png'
 
 export default function Layout() {
   const navigate = useNavigate()
 
   return (
     <>
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-blue-50 shadow-sm border-b border-blue-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <motion.button
@@ -20,7 +20,7 @@ export default function Layout() {
               <img
                 src={logo}
                 alt="Money Tracker Logo"
-                className="h-20 w-auto cursor-pointer"
+                className="h-12 w-auto cursor-pointer"
               />
             </motion.button>
             <h3 className="text-sm text-gray-500"> Smart Money Management Simple Tracking</h3>
@@ -37,7 +37,7 @@ export default function Layout() {
             <img
               src={logo}
               alt="Money Tracker Logo"
-              className="h-10 w-auto"
+              className="h-6 w-auto"
             />
             <span className="text-sm text-luxury-navy/60">@ 2025 Money Tracker. All rights reserved.</span>
           </div>

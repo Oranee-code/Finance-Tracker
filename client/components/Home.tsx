@@ -12,10 +12,12 @@ import moneyBg from '../../Image/Money BG2.jpg'
 
 // Sample data for preview - Display landing page preview
 const SAMPLE_CHART_DATA = [
-  { name: '45% Mortgage', value: 45, color: '#1e3a5f' },
-  { name: '25% Groceries',  value: 25, color: '#0d9488' },
-  { name: '18% Dining Out',  value: 18, color: '#7dd3fc' },
-  { name: '12% Entertainment', value: 12, color: '#2d4a6f' },
+  { name: '35% Mortgage', value: 35, color: '#1e3a5f' },
+  { name: '20% Groceries', value: 20, color: '#0d9488' },
+  { name: '18% Utilities', value: 18, color: '#bae6fd' },
+  { name: '10% Dining Out', value: 10, color: '#3b82f6' },
+  { name: '5% Entertainment', value: 5, color: '#2d4a6f' },
+  { name: '12% Savings', value: 12, color: '#7dd3fc' },
 ]
 
 export default function Home() {
@@ -79,9 +81,9 @@ export default function Home() {
         balance: realSummary.balance || 0,
       }
     : {
-        income: 4250,
-        expenses: 2250,
-        balance: 2000,
+        income: 2300,
+        expenses: 1320,
+        balance: 980,
       }
 
   if (isLoading) {
@@ -146,47 +148,51 @@ export default function Home() {
                 className="space-y-12"
               >
                 <h1 className="text-5xl lg:text-6xl font-serif font-semibold text-luxury-navy leading-tight">
-                  Take Control of
-                  <span className="block text-luxury-teal">Your Finances</span>
+                  Where Does 
+                  <br></br>Your Money 
+                  <span className="block text-luxury-teal">Really Go?</span>
                 </h1>
                 <p className="text-lg text-luxury-navy/70 font-sans leading-relaxed max-w-lg">
-                  Elegantly track your income and expenses. Get beautiful insights 
-                  into your spending habits with intuitive visualizations.
+                  Track Everything. Understand Anything.<br></br> Take Control Of Your Finances.
                 </p>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowAddModal(true)}
-                  className="luxury-btn text-white font-semibold py-5 px-10 rounded-xl text-base flex items-center gap-4 relative z-10"
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1.0, delay: 2 }}
                 >
-                  <motion.span
-                    animate={{ rotate: [0, 45, -45, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 5 }}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowAddModal(true)}
+                    className="luxury-btn text-white font-semibold py-5 px-10 rounded-xl text-base flex items-center gap-4 relative z-10"
                   >
-                    <Sparkles className="w-6 h-6 relative z-10" />
-                  </motion.span>
-                  <motion.span 
-                    className="relative z-10 text-lg"
-                    initial={{ opacity: 0.5 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5, delay: 2 }}
-                  >
-                    Create Your First Tracker
-                  </motion.span>
-                  <motion.span
-                    animate={{ rotate: [0, 45, -45, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 5 }}
-                  >
-                    <Sparkles className="w-6 h-6 relative z-10" />
-                  </motion.span>
-                </motion.button>
+                    <motion.span
+                      animate={{ rotate: [0, 45, -45, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 5 }}
+                    >
+                      <Sparkles className="w-6 h-6 relative z-10" />
+                    </motion.span>
+                    
+
+                    <span className="relative z-10 text-lg">
+                      Create Your First Tracker
+                    </span>
+                    <motion.span
+                      animate={{ rotate: [0, 45, -45, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      <Sparkles className="w-6 h-6 relative z-10" />
+                    </motion.span>
+                  </motion.button>
+                </motion.div>
               </motion.div>
 
               {/* Right Landing Page Preview Dashboard */}
               <motion.div
                 initial={{ opacity: 0, x: 40 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.7, delay: 1.0 }}
+                transition={{ duration: 0.7, delay: 1 }}
                 className="relative"
               >
                 <div className="preview-chart-container p-10 shadow-2xl">
@@ -199,17 +205,23 @@ export default function Home() {
                       <h3 className="text-4xl font-serif font-semibold text-luxury-navy">
                         ${displaySummary.balance.toLocaleString()}
                       </h3>
-                      <p className="text-sm text-luxury-teal mb-4">
+                      <p className="text-sm text-luxury-teal mb-10">
                         {hasRealData ? 'Current Balance' : 'Your balance'}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl text-green-600 font-medium">
-                        +${displaySummary.income.toLocaleString()}
-                      </p>
-                      <p className="text-xl text-red-500 font-medium">
-                        -${displaySummary.expenses.toLocaleString()}
-                      </p>
+                      <div className="mb-1">
+                        <p className="text-xl text-green-600 font-medium">
+                          +${displaySummary.income.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-green-600 font-medium -mt-0.1">income</p>
+                      </div>
+                      <div>
+                        <p className="text-xl text-red-500 font-medium">
+                          -${displaySummary.expenses.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-red-500 font-medium -mt-0.1">expense</p>
+                      </div>
                     </div>
                   </div>
 
@@ -273,7 +285,7 @@ export default function Home() {
                   Multiple Trackers
                 </h3>
                 <p className="text-luxury-navy/60 text-sm leading-relaxed">
-                  Create separate trackers for personal, business, or any financial goal you have in mind.
+                  Create separate trackers for your personal, business, or saving goals.
                 </p>
               </div>
 
@@ -286,7 +298,7 @@ export default function Home() {
                   Smart Categories
                 </h3>
                 <p className="text-luxury-navy/60 text-sm leading-relaxed">
-                  Organize transactions with custom categories. See exactly where your money flows.
+                  Organize your spending with custom categories so you know where your money goes.
                 </p>
               </div>
 
@@ -299,7 +311,7 @@ export default function Home() {
                   Visual Insights
                 </h3>
                 <p className="text-luxury-navy/60 text-sm leading-relaxed">
-                  Beautiful charts and summaries help you understand your financial patterns at a glance.
+                  Beautiful charts give you a clear picture of your spending habits.
                 </p>
               </div>
             </motion.div>

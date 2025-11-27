@@ -9,6 +9,7 @@ import * as transactionApi from '../apis/transactions.ts'
 import * as categoryApi from '../apis/categories.ts'
 import { useUserInfo } from '../hooks/useUserInfo.ts'
 import { format } from 'date-fns'
+import moneyBg from '../../Image/Money BG2.jpg'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6']
 
@@ -89,6 +90,15 @@ export default function TrackerDashboard() {
   }
 
   return (
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `linear-gradient(rgba(235, 239, 248, 0.85), rgba(245, 240, 232, 0.9)), url(${moneyBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -315,6 +325,7 @@ export default function TrackerDashboard() {
           />
         )}
       </motion.div>
+    </div>
     </div>
   )
 }

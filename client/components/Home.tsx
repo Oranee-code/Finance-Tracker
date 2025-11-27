@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Wallet, PieChart as PieChartIcon, TrendingUp, Sparkles } from 'lucide-react'
+import { Plus, Wallet, PieChart as PieChartIcon, TrendingUp, Sparkles, DollarSign } from 'lucide-react'
 import { useState } from 'react'
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
@@ -332,7 +332,7 @@ export default function Home() {
                   className="w-full px-4 py-3 border border-luxury-beige rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-luxury-teal/50 focus:border-luxury-teal bg-white/80 text-luxury-navy placeholder:text-luxury-navy/40"
                   autoFocus
                 />
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <button
                     type="submit"
                     disabled={!trackerName.trim() || addMutation.isPending}
@@ -406,7 +406,7 @@ function TrackerCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ scale: 1.02, y: -4 }}
-      className="glass-card glass-card-hover rounded-2xl p-6 cursor-pointer"
+      className="glass-card glass-card-hover rounded-2xl p-10 cursor-pointer"
       onClick={onClick}
     >
       {/* Header with name and icon */}
@@ -415,7 +415,8 @@ function TrackerCard({
           {tracker.name}
         </h3>
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-luxury-teal to-luxury-teal-light flex items-center justify-center">
-          <Wallet className="w-5 h-5 text-white" />
+          <DollarSign className="w-5 h-5 text-black" />
+          
         </div>
       </div>
 
@@ -427,8 +428,8 @@ function TrackerCard({
           </p>
       </div>
 
-      {/* Mini Spending Chart Section */}
-      <div className="flex items-center gap-3 mb-3 py-2 border-t border-luxury-beige">
+      {/* Mini Spending Chart Section on home page*/}
+      <div className="flex items-center gap-4 mb-6 py-6 border-t border-luxury-beige">
         {hasSpendingData ? (
           <>
             {/* Mini Donut Chart */}
@@ -455,7 +456,7 @@ function TrackerCard({
             {/* Category Labels */}
             <div className="flex flex-wrap gap-x-2 gap-y-1 flex-1">
               {miniChartData.slice(0, 3).map((item: any, i: number) => (
-                <div key={i} className="flex items-center gap-1">
+                <div key={i} className="flex items-center gap-2">
                   <div 
                     className="w-2 h-2 rounded-full flex-shrink-0" 
                     style={{ backgroundColor: item.color }}
@@ -479,7 +480,7 @@ function TrackerCard({
       </div>
 
       {/* Last Updated */}
-      <p className="text-xs text-luxury-navy/40 mb-3">
+      <p className="text-xs text-luxury-navy/50 mb-10">
         Last updated: {format(new Date(tracker.updated_at), 'MMM d, yyyy')}
       </p>
 

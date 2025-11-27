@@ -23,7 +23,7 @@ export default function Layout() {
                 className="h-20 w-auto cursor-pointer"
               />
             </motion.button>
-            <h3 className="text-sm text-gray-500"> Smart Money Management simple tracking</h3>
+            <h3 className="text-sm text-gray-500"> Smart Money Management Simple Tracking</h3>
             <LogoutButton />
           </div>
         </div>

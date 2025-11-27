@@ -18,6 +18,7 @@ export default function GuestProfileModal({
   const [name, setName] = useState(guestUser?.name || 'Guest User')
   const [isSaving, setIsSaving] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     if (guestUser) {
@@ -75,13 +76,13 @@ export default function GuestProfileModal({
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Guest Profile</h2>
-            <p className="text-sm text-gray-500">Customize your profile</p>
+           
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-10">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-900 mb-4">
               Display Name
             </label>
             <input
@@ -89,18 +90,16 @@ export default function GuestProfileModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               autoFocus
               maxLength={50}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              This name will be displayed throughout the app
-            </p>
+            
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-xs text-gray-600 mb-1">Guest ID</p>
-            <p className="text-sm font-mono text-gray-800 break-all">
+            <p className="text-sm font-mono text-gray-500 break-all">
               {guestUser?.id}
             </p>
           </div>
@@ -116,7 +115,8 @@ export default function GuestProfileModal({
           <button
             onClick={handleSave}
             disabled={!name.trim() || isSaving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 
+            rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
@@ -127,15 +127,40 @@ export default function GuestProfileModal({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Log Out
-          </motion.button>
+          {showLogoutConfirm ? (
+            <div className="space-y-2">
+              <p className="text-sm text-red-600 font-medium text-center">
+                Are you sure you want to log out? You may lose your data.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleLogout}
+                  className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Confirm Logout
+                </motion.button>
+              </div>
+            </div>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowLogoutConfirm(true)}
+              className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Log Out
+            </motion.button>
+          )}
 
           {showDeleteConfirm ? (
             <div className="space-y-2">
@@ -145,7 +170,7 @@ export default function GuestProfileModal({
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+                  className="flex-1 bg-gray-100 hover:bg-gray-400 text-grey-800 font-semibold py-2 px-4 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -153,10 +178,10 @@ export default function GuestProfileModal({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleDeleteData}
-                  className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                  Yes, Delete All Data
+                  Delete All
                 </motion.button>
               </div>
             </div>
@@ -168,7 +193,7 @@ export default function GuestProfileModal({
               className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-              Delete All Data
+              Delete Account
             </motion.button>
           )}
         </div>

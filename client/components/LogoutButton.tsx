@@ -2,6 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { CircleUserRound } from 'lucide-react'
 import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
 import GuestProfileModal from './GuestProfileModal.tsx'
 
@@ -40,16 +41,15 @@ export default function LogoutButton() {
                 setShowProfileModal(true)
               }
             }}
-            className={`text-sm font-medium transition-colors ${
-              isGuest
-                ? 'text-indigo-600 hover:text-indigo-700 cursor-pointer underline'
-                : 'text-gray-700 cursor-default'
+            className={`flex items-center gap-2 text-sm font-medium transition-colors text-black ${
+              isGuest ? 'cursor-pointer hover:text-gray-300' : 'cursor-default'
             }`}
             title={isGuest ? 'Click to open profile' : undefined}
           >
+            <CircleUserRound className="w-8 h-8" />
             {displayName}
             {isGuest && (
-              <span className="ml-2 text-xs text-gray-500">(Guest)</span>
+              <span className="ml-2 text-xs text-gray-300">(Guest)</span>
             )}
           </motion.button>
         )}
@@ -58,7 +58,7 @@ export default function LogoutButton() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            className="bg-red-500 hover:bg-red-600 text-black font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
             title="Logout"
           >
             Logout

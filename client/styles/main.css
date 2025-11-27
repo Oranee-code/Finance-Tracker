@@ -8,8 +8,8 @@
   --luxury-beige: #f5f0e8;
   --luxury-navy: #1e3a5f;
   --luxury-navy-light: #2d4a6f;
-  --luxury-teal: #0d9488;
-  --luxury-teal-light: #14b8a6;
+  --luxury-teal: #0cdcba;
+  --luxury-teal-light: #1d86d2;
   --luxury-sky: #7dd3fc;
   --luxury-sky-light: #bae6fd;
 }
@@ -42,7 +42,7 @@ body {
   background: 
     radial-gradient(ellipse at 20% 0%, rgba(125, 211, 252, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 100%, rgba(13, 148, 136, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(245, 240, 232, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, rgba(186, 206, 210, 0.5) 0%, transparent 70%),
     var(--luxury-cream);
 }
 

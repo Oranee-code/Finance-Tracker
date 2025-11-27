@@ -51,13 +51,9 @@ export default function GuestProfileModal({
   }
 
   const handleDeleteData = () => {
-    if (window.confirm('Are you sure you want to permanently delete all guest data? This cannot be undone.')) {
-      clearGuestData()
-      navigate('/login')
-      onClose()
-    } else {
-      setShowDeleteConfirm(false)
-    }
+    clearGuestData()
+    navigate('/login')
+    onClose()
   }
 
   if (!isOpen) return null
@@ -108,17 +104,17 @@ export default function GuestProfileModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={handleCancel}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!name.trim() || isSaving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 
+            className="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold py-3 px-4 
             rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSaving ? 'Saving...' : 'Save Changes'}
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
 
@@ -190,7 +186,7 @@ export default function GuestProfileModal({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowDeleteConfirm(true)}
-              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               Delete Account

@@ -8,6 +8,7 @@ import * as trackerApi from '../apis/trackers.ts'
 import * as transactionApi from '../apis/transactions.ts'
 import { useUserInfo } from '../hooks/useUserInfo.ts'
 import { format } from 'date-fns'
+import moneyBg from '../../Image/Money BG2.jpg'
 
 // Sample data for preview - Display landing page preview
 const SAMPLE_CHART_DATA = [
@@ -92,7 +93,18 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen luxury-gradient-bg relative overflow-hidden">
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={trackers.length > 0 ? {
+        backgroundImage: `linear-gradient(rgba(235, 239, 248, 0.85), rgba(245, 240, 232, 0.9)), url(${moneyBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      } : undefined}
+    >
+     
+      {trackers.length === 0 && <div className="absolute inset-0 luxury-gradient-bg"></div>}
+      
       {/* Floating decorative orbs */}
       <div className="floating-orb floating-orb-1"></div>
       <div className="floating-orb floating-orb-2"></div>
@@ -105,8 +117,8 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="flex justify-between items-center mb-6"
         >
-          <h1 className="text-3xl font-serif font-semibold text-luxury-navy">
-            {trackers.length > 0 ? 'Your Trackers' : ''}
+          <h1 className={`${trackers.length > 0 ? 'text-4xl font-sans font-bold text-indigo-700 ml-8 -mt-10' : 'text-3xl font-serif font-semibold text-luxury-navy'}`}>
+            {trackers.length > 0 ? 'Your Dashboard' : ''}
           </h1>
           {trackers.length > 0 && (
             <motion.button
@@ -422,7 +434,7 @@ function TrackerCard({
 
       {/* Net Balance */}
       <div className="mb-3">
-        <p className="text-xs text-luxury-navy/50 uppercase tracking-wider">Net Balance</p>
+        <p className="text-xs text-luxury-navy/50 uppercase tracking-wider">Total Balance</p>
 <p className={`text-2xl font-semibold ${netBalance >= 0 ? 'text-green-600' : 'text-red-500'}`}>
             {netBalance < 0 ? '-' : ''}${Math.abs(netBalance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>

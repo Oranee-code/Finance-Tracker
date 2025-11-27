@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown } from 'lucide-react'
+import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
@@ -96,7 +96,7 @@ export default function TrackerDashboard() {
         transition={{ duration: 0.5 }}
       >
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-12 mb-8">
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -159,7 +159,10 @@ export default function TrackerDashboard() {
                 : 'bg-orange-50 border-orange-200'
             }`}
           >
-            <h3 className="text-sm font-medium mb-2">Net Balance</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <Landmark className={`w-5 h-5 ${(summary?.balance || 0) >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
+              <h3 className={`text-sm font-medium ${(summary?.balance || 0) >= 0 ? 'text-blue-800' : 'text-orange-800'}`}>Total Balance</h3>
+            </div>
             <p
               className={`text-3xl font-bold ${
                 (summary?.balance || 0) >= 0 ? 'text-blue-700' : 'text-orange-700'
@@ -254,7 +257,7 @@ export default function TrackerDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-lg shadow-md p-6"
+          className="bg-blue-50 rounded-lg shadow-md p-6"
         >
           <h3 className="text-xl font-semibold mb-4">Recent Transactions</h3>
           {transactions.length === 0 ? (

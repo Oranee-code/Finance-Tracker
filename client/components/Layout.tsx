@@ -1,15 +1,48 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import LogoutButton from './LogoutButton.tsx'
+import logo from '../../Image/logo.png'
 
 export default function Layout() {
+  const navigate = useNavigate()
+
   return (
     <>
-      <header>
-        <h1>Fullstack Boilerplate - with Fruits!</h1>
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/')}
+              className="flex items-center gap-3"
+            >
+              <img
+                src={logo}
+                alt="Money Tracker Logo"
+                className="h-20 w-auto cursor-pointer"
+              />
+            </motion.button>
+            <h3 className="text-sm text-gray-500"> Smart Money Management simple tracking</h3>
+            <LogoutButton />
+          </div>
+        </div>
       </header>
-      <main>
+      <main className="min-h-screen bg-gray-50">
         <Outlet />
       </main>
-      <footer></footer>
+      <footer className="bg-gray-50 border-t border-luxury-beige py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-2">
+            <img
+              src={logo}
+              alt="Money Tracker Logo"
+              className="h-10 w-auto"
+            />
+            <span className="text-sm text-luxury-navy/60">@ 2025 Money Tracker. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
     </>
   )
 }

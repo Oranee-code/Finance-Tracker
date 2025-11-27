@@ -32,5 +32,16 @@ router.post('/', async (req, res, next) => {
   }
 })
 
+// Reset categories to defaults (with emojis)
+router.post('/reset', async (req, res, next) => {
+  try {
+    const { userId, isGuest } = getUserId(req)
+    const categories = await db.resetCategories(userId, isGuest)
+    res.json(categories)
+  } catch (err) {
+    next(err)
+  }
+})
+
 export default router
 

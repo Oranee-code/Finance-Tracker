@@ -134,7 +134,7 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* CTA Button luxury style */
+/* Button on landing page*/
 .luxury-btn {
   background: linear-gradient(135deg, var(--luxury-teal), var(--luxury-navy));
   position: relative;
@@ -156,7 +156,7 @@ body {
 }
 
 .luxury-btn:hover {
-  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 65, 59, 0.35);
   transform: translateY(-2px);
 }
 

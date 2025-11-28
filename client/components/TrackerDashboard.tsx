@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark } from 'lucide-react'
+import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart} from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
@@ -80,6 +80,28 @@ export default function TrackerDashboard() {
 
   const incomeCategories = categories.filter((c: any) => c.type === 'income')
   const expenseCategories = categories.filter((c: any) => c.type === 'expense')
+
+  // Show and Calculate date range from transactions
+  const getDateRange = () => {
+    if (transactions.length === 0) return null
+    
+    const dates = transactions
+      .map((t: any) => new Date(t.transaction_date))
+      .filter((date: Date) => !isNaN(date.getTime()))
+      .sort((a: Date, b: Date) => a.getTime() - b.getTime())
+    
+    if (dates.length === 0) return null
+    
+    const earliest = dates[0]
+    const latest = dates[dates.length - 1]
+    
+    return {
+      start: earliest,
+      end: latest,
+    }
+  }
+
+  const dateRange = getDateRange()
 
   if (!tracker) {
     return (
@@ -184,31 +206,39 @@ export default function TrackerDashboard() {
         </div>
 
         {/* Add Buttons */}
-        <div className="flex gap-4 mb-8">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setTransactionType('income')
-              setShowAddModal(true)
-            }}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add Income
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              setTransactionType('expense')
-              setShowAddModal(true)
-            }}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add Expense
-          </motion.button>
+        <div className="mb-4">
+          <div className="flex gap-4 mb-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setTransactionType('income')
+                setShowAddModal(true)
+              }}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+              <Plus className="w-6 h-6" />
+              Add Income
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setTransactionType('expense')
+                setShowAddModal(true)
+              }}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+              <Plus className="w-6 h-6" />
+              Add Expense
+            </motion.button>
+          </div>
+          {dateRange && (
+            <p className="text-xl text-gray-800 mt-6 mb-6 flex items-center gap-6 ">
+              <CalendarHeart className="w-6 h-6 inline-block mb-2" />
+              <span>{format(dateRange.start, 'd MMM yyyy')} - {format(dateRange.end, 'd MMM yyyy')}</span>
+            </p>
+          )}
         </div>
 
         {/* Charts */}
@@ -696,7 +726,7 @@ function EditTrackerModal({
         {showDeleteConfirm ? (
           <div className="space-y-3">
             <p className="text-sm text-red-600 font-medium">
-              Are you sure you want to delete "{trackerName}"? This action cannot be undone.
+              Are you sure you want to delete "{trackerName}"? 
             </p>
             <div className="flex gap-3">
               <button

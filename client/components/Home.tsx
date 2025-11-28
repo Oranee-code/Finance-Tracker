@@ -10,7 +10,7 @@ import { useUserInfo } from '../hooks/useUserInfo.ts'
 import { format } from 'date-fns'
 import moneyBg from '../../Image/Money BG2.jpg'
 
-// Sample data for preview - Display landing page preview
+// Sample data - Display landing page preview
 const SAMPLE_CHART_DATA = [
   { name: '35% Mortgage', value: 35, color: '#1e3a5f' },
   { name: '20% Groceries', value: 20, color: '#0d9488' },
@@ -152,7 +152,7 @@ export default function Home() {
                   <br></br>Your Money 
                   <span className="block text-luxury-teal">Really Go?</span>
                 </h1>
-                <p className="text-lg text-luxury-navy/70 font-sans leading-relaxed max-w-lg">
+                <p className="text-lg text-luxury-navy/80 font-sans leading-relaxed max-w-lg">
                   Track Everything. Understand Anything.<br></br> Take Control Of Your Finances.
                 </p>
                 
@@ -205,29 +205,29 @@ export default function Home() {
                       <h3 className="text-4xl font-serif font-semibold text-luxury-navy">
                         ${displaySummary.balance.toLocaleString()}
                       </h3>
-                      <p className="text-sm text-luxury-teal mb-10">
+                      <p className="text-sm text-luxury-teal mb-2">
                         {hasRealData ? 'Current Balance' : 'Your balance'}
                       </p>
                     </div>
                     <div className="text-right">
                       <div className="mb-1">
-                        <p className="text-xl text-green-600 font-medium">
+                        <p className="text-1xl text-green-600 font-medium">
                           +${displaySummary.income.toLocaleString()}
                         </p>
-                        <p className="text-xs text-green-600 font-medium -mt-0.1">income</p>
+                        <p className="text-xs text-green-600 font-medium">income</p>
                       </div>
                       <div>
-                        <p className="text-xl text-red-500 font-medium">
+                        <p className="text-1xl text-red-500 font-medium">
                           -${displaySummary.expenses.toLocaleString()}
                         </p>
-                        <p className="text-xs text-red-500 font-medium -mt-0.1">expense</p>
+                        <p className="text-xs text-red-500 font-medium">expense</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Donut Chart with percentage labels on Right */}
                   <div className="donut-chart flex flex-col items-center">
-                    <p className="text-1sm text-luxury-navy/50 font-medium uppercase tracking-wider mb-4 text-center">
+                    <p className="text-xl text-luxury-navy/50 font-medium uppercase tracking-wider mb-2 text-center">
                       Spending by Category
                     </p>
                     <div className="flex items-center justify-center gap-16">
@@ -254,7 +254,7 @@ export default function Home() {
                       {/* percentage labels - Right side */}
                       <div className="flex flex-col gap-2">
                         {SAMPLE_CHART_DATA.map((item: any, index: number) => (
-                          <div key={index} className="flex items-center gap-6">
+                          <div key={index} className="flex items-center gap-8">
                             <div 
                               className="w-3 h-3 rounded-full" 
                               style={{ backgroundColor: item.color }}

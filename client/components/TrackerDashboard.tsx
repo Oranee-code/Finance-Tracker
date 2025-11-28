@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart} from 'lucide-react'
+import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart, Wallet, CreditCard, PiggyBank, Briefcase, Home, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
@@ -13,6 +13,22 @@ import moneyBg from '../../Image/Money BG2.jpg'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6']
 
+// Icon options for tracker selection
+const TRACKER_ICONS = [
+  { name: 'Wallet', component: Wallet },
+  { name: 'CreditCard', component: CreditCard },
+  { name: 'PiggyBank', component: PiggyBank },
+  { name: 'Briefcase', component: Briefcase },
+  { name: 'Home', component: Home },
+  { name: 'ShoppingBag', component: ShoppingBag },
+  { name: 'Car', component: Car },
+  { name: 'Heart', component: Heart },
+  { name: 'Star', component: Star },
+  { name: 'Target', component: Target },
+  { name: 'Building2', component: Building2 },
+  { name: 'DollarSign', component: DollarSign },
+]
+
 export default function TrackerDashboard() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -22,6 +38,7 @@ export default function TrackerDashboard() {
   const [transactionType, setTransactionType] = useState<'income' | 'expense'>('expense')
   const [showEditModal, setShowEditModal] = useState(false)
   const [editName, setEditName] = useState('')
+  const [editIcon, setEditIcon] = useState('Wallet')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const trackerId = Number(id)
@@ -60,7 +77,7 @@ export default function TrackerDashboard() {
   })
 
   const updateTrackerMutation = useMutation({
-    mutationFn: (name: string) => trackerApi.updateTracker(trackerId, name, userId, isGuest),
+    mutationFn: ({ name, icon }: { name: string; icon: string }) => trackerApi.updateTracker(trackerId, name, userId, isGuest, icon),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tracker', trackerId, userId, isGuest] })
       setShowEditModal(false)
@@ -70,6 +87,7 @@ export default function TrackerDashboard() {
   useEffect(() => {
     if (tracker) {
       setEditName(tracker.name)
+      setEditIcon(tracker.icon || 'Wallet')
     }
   }, [tracker])
 
@@ -339,11 +357,14 @@ export default function TrackerDashboard() {
         {showEditModal && (
           <EditTrackerModal
             name={editName}
+            icon={editIcon}
             onNameChange={setEditName}
-            onSave={() => updateTrackerMutation.mutate(editName)}
+            onIconChange={setEditIcon}
+            onSave={() => updateTrackerMutation.mutate({ name: editName, icon: editIcon })}
             onCancel={() => {
               setShowEditModal(false)
               setEditName(tracker.name)
+              setEditIcon(tracker.icon || 'Wallet')
               setShowDeleteConfirm(false)
             }}
             onDelete={() => deleteTrackerMutation.mutate()}
@@ -678,7 +699,9 @@ function AddTransactionModal({
 
 function EditTrackerModal({
   name,
+  icon,
   onNameChange,
+  onIconChange,
   onSave,
   onCancel,
   onDelete,
@@ -693,7 +716,7 @@ function EditTrackerModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-lg p-6 max-w-md w-full"
+        className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
       >
         <h2 className="text-2xl font-bold mb-4">Edit Tracker</h2>
         <input
@@ -703,6 +726,38 @@ function EditTrackerModal({
           className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           autoFocus
         />
+        
+        {/* Icon Selection */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600 mb-2">
+            Choose an Icon
+          </label>
+          <div className="grid grid-cols-6 gap-2">
+            {TRACKER_ICONS.map((iconOption) => {
+              const IconComponent = iconOption.component
+              const isSelected = icon === iconOption.name
+              return (
+                <motion.button
+                  key={iconOption.name}
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onIconChange(iconOption.name)}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    isSelected
+                      ? 'border-indigo-600 bg-indigo-50'
+                      : 'border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  <IconComponent className={`w-5 h-5 mx-auto ${
+                    isSelected ? 'text-indigo-600' : 'text-gray-600'
+                  }`} />
+                </motion.button>
+              )
+            })}
+          </div>
+        </div>
+
         <div className="flex gap-3 mb-4">
           <button
             onClick={onSave}

@@ -32,12 +32,12 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const { userId, isGuest } = getUserId(req)
-    const { name } = req.body
+    const { name, icon } = req.body
     if (!name) {
       res.status(StatusCodes.BAD_REQUEST).json({ message: 'Name is required' })
       return
     }
-    const id = await db.addTracker({ name, user_id: userId, is_guest: isGuest })
+    const id = await db.addTracker({ name, icon: icon || 'Wallet', user_id: userId, is_guest: isGuest })
     res.status(StatusCodes.CREATED).json({ id })
   } catch (err) {
     next(err)
@@ -47,8 +47,11 @@ router.post('/', async (req, res, next) => {
 router.patch('/:id', async (req, res, next) => {
   try {
     const { userId, isGuest } = getUserId(req)
-    const { name } = req.body
-    await db.updateTracker(Number(req.params.id), userId, isGuest, { name })
+    const { name, icon } = req.body
+    const updates: { name?: string; icon?: string } = {}
+    if (name !== undefined) updates.name = name
+    if (icon !== undefined) updates.icon = icon
+    await db.updateTracker(Number(req.params.id), userId, isGuest, updates)
     res.sendStatus(StatusCodes.NO_CONTENT)
   } catch (err) {
     next(err)

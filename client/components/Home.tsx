@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Wallet, PieChart as PieChartIcon, TrendingUp, Sparkles, DollarSign } from 'lucide-react'
+import { Plus, Wallet, PieChart as PieChartIcon, TrendingUp, Sparkles, DollarSign, CreditCard, PiggyBank, Briefcase, Home as HomeIcon, ShoppingBag, Car, Heart, Star, Target, Building2 } from 'lucide-react'
 import { useState } from 'react'
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
@@ -20,12 +20,29 @@ const SAMPLE_CHART_DATA = [
   { name: '12% Savings', value: 12, color: '#7dd3fc' },
 ]
 
+// Icon options for tracker selection
+const TRACKER_ICONS = [
+  { name: 'Wallet', component: Wallet },
+  { name: 'CreditCard', component: CreditCard },
+  { name: 'PiggyBank', component: PiggyBank },
+  { name: 'Briefcase', component: Briefcase },
+  { name: 'Home', component: HomeIcon },
+  { name: 'ShoppingBag', component: ShoppingBag },
+  { name: 'Car', component: Car },
+  { name: 'Heart', component: Heart },
+  { name: 'Star', component: Star },
+  { name: 'Target', component: Target },
+  { name: 'Building2', component: Building2 },
+  { name: 'DollarSign', component: DollarSign },
+]
+
 export default function Home() {
   const { userId, isGuest } = useUserInfo()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [showAddModal, setShowAddModal] = useState(false)
   const [trackerName, setTrackerName] = useState('')
+  const [selectedIcon, setSelectedIcon] = useState('Wallet')
 
   const { data: trackers = [], isLoading } = useQuery({
     queryKey: ['trackers', userId, isGuest],
@@ -47,18 +64,19 @@ export default function Home() {
   })
 
   const addMutation = useMutation({
-    mutationFn: (name: string) => trackerApi.addTracker(name, userId, isGuest),
+    mutationFn: ({ name, icon }: { name: string; icon: string }) => trackerApi.addTracker(name, userId, isGuest, icon),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       setShowAddModal(false)
       setTrackerName('')
+      setSelectedIcon('Wallet')
     },
   })
 
   const handleAddTracker = (e: React.FormEvent) => {
     e.preventDefault()
     if (trackerName.trim()) {
-      addMutation.mutate(trackerName.trim())
+      addMutation.mutate({ name: trackerName.trim(), icon: selectedIcon })
     }
   }
 
@@ -353,9 +371,41 @@ export default function Home() {
                   value={trackerName}
                   onChange={(e) => setTrackerName(e.target.value)}
                   placeholder="e.g., Personal, Business, Savings..."
-                  className="w-full px-4 py-3 border border-luxury-beige rounded-xl mb-6 focus:outline-none focus:ring-2 focus:ring-luxury-teal/50 focus:border-luxury-teal bg-white/80 text-luxury-navy placeholder:text-luxury-navy/40"
+                  className="w-full px-4 py-3 border border-luxury-beige rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-luxury-teal/50 focus:border-luxury-teal bg-white/80 text-luxury-navy placeholder:text-luxury-navy/40"
                   autoFocus
                 />
+                
+                {/* Icon Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-luxury-navy mb-3">
+                    Choose an Icon
+                  </label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {TRACKER_ICONS.map((icon) => {
+                      const IconComponent = icon.component
+                      const isSelected = selectedIcon === icon.name
+                      return (
+                        <motion.button
+                          key={icon.name}
+                          type="button"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setSelectedIcon(icon.name)}
+                          className={`p-3 rounded-xl border-2 transition-all ${
+                            isSelected
+                              ? 'border-luxury-teal bg-luxury-teal/10'
+                              : 'border-luxury-beige hover:border-luxury-teal/50'
+                          }`}
+                        >
+                          <IconComponent className={`w-6 h-6 mx-auto ${
+                            isSelected ? 'text-luxury-teal' : 'text-luxury-navy/60'
+                          }`} />
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </div>
+
                 <div className="flex gap-4">
                   <button
                     type="submit"
@@ -371,6 +421,7 @@ export default function Home() {
                     onClick={() => {
                       setShowAddModal(false)
                       setTrackerName('')
+                      setSelectedIcon('Wallet')
                     }}
                     className="flex-1 bg-luxury-beige hover:bg-luxury-beige/80 text-luxury-navy font-semibold py-3 px-4 rounded-xl transition-colors"
                   >
@@ -388,6 +439,12 @@ export default function Home() {
 
 // Tracker Card Component with mini spending chart
 const CHART_COLORS = ['#1e3a5f', '#0d9488', '#7dd3fc', '#2d4a6f', '#14b8a6', '#bae6fd']
+
+// Helper function to get icon component by name
+const getIconComponent = (iconName?: string) => {
+  const icon = TRACKER_ICONS.find(i => i.name === (iconName || 'Wallet'))
+  return icon ? icon.component : Wallet
+}
 
 function TrackerCard({ 
   tracker, 
@@ -423,6 +480,7 @@ function TrackerCard({
 
   const hasSpendingData = miniChartData.length > 0
   const netBalance = summary?.balance || 0
+  const IconComponent = getIconComponent(tracker.icon)
 
   return (
     <motion.div
@@ -439,8 +497,7 @@ function TrackerCard({
           {tracker.name}
         </h3>
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-luxury-teal to-luxury-teal-light flex items-center justify-center">
-          <DollarSign className="w-5 h-5 text-black" />
-          
+          <IconComponent className="w-5 h-5 text-black" />
         </div>
       </div>
 

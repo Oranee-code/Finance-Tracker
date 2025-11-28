@@ -21,13 +21,14 @@ export async function getTracker(id: number, userId: string, isGuest: boolean) {
 export async function addTracker(
   name: string,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  icon?: string
 ) {
   const res = await request
     .post(baseUrl)
     .set('X-Guest-Id', userId)
     .set('X-Is-Guest', isGuest.toString())
-    .send({ name })
+    .send({ name, icon })
   return res.body
 }
 
@@ -35,13 +36,14 @@ export async function updateTracker(
   id: number,
   name: string,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  icon?: string
 ) {
   await request
     .patch(`${baseUrl}/${id}`)
     .set('X-Guest-Id', userId)
     .set('X-Is-Guest', isGuest.toString())
-    .send({ name })
+    .send({ name, icon })
 }
 
 export async function deleteTracker(

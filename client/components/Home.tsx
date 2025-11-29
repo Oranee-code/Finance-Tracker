@@ -167,7 +167,7 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="flex justify-between items-center mb-6"
         >
-          <h1 className={`${trackers.length > 0 ? 'text-4xl font-sans font-bold text-indigo-700 ml-8 -mt-10' : 'text-3xl font-serif font-semibold text-luxury-navy'}`}>
+          <h1 className={`${trackers.length > 0 ? 'text-4xl font-sans font-bold text-blue-500 ml-8 -mt-10' : 'text-3xl font-serif font-semibold text-luxury-navy'}`}>
             {trackers.length > 0 ? 'Your Dashboard' : ''}
           </h1>
           {trackers.length > 0 && (
@@ -326,7 +326,7 @@ export default function Home() {
             >
               {/* Feature 1 */}
               <div className="feature-card glass-card glass-card-hover rounded-2xl p-6">
-                <div className="feature-icon w-12 h-12 rounded-xl bg-gradient-to-br from-luxury-navy to-luxury-navy-light flex items-center justify-center mb-4">
+                <div className="feature-icon w-12 h-12 rounded-xl bg-gradient-to-br from-luxury-sky-light to-luxury-sky flex items-center justify-center mb-4">
                   <Wallet className="w-8 h-8 text-luxury-navy" />
                 </div>
                 <h3 className="text-xl font-serif font-semibold text-luxury-navy mb-2">
@@ -339,7 +339,7 @@ export default function Home() {
 
               {/* Feature 2 */}
               <div className="feature-card glass-card glass-card-hover rounded-2xl p-6">
-                <div className="feature-icon w-12 h-12 rounded-xl bg-gradient-to-br from-luxury-teal to-luxury-teal-light flex items-center justify-center mb-4">
+                <div className="feature-icon w-12 h-12 rounded-xl bg-gradient-to-br from-luxury-sky-light to-luxury-sky flex items-center justify-center mb-4">
                   <PieChartIcon className="w-8 h-8 text-luxury-navy" />
                 </div>
                 <h3 className="text-xl font-serif font-semibold text-luxury-navy mb-2">
@@ -638,7 +638,8 @@ function TrackerCard({
           e.stopPropagation()
           onClick()
         }}
-        className="w-full py-2 text-sm font-medium text-luxury-navy/70 hover:text-luxury-teal border border-luxury-beige hover:border-luxury-teal/30 rounded-lg transition-colors flex items-center justify-center gap-1"
+        className="w-full py-2 text-sm font-medium text-luxury-navy/70 hover:text-luxury-teal border border-luxury-sky 
+        hover:border-luxury-teal/30 rounded-lg transition-colors flex items-center justify-center gap-1"
       >
         Show More
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

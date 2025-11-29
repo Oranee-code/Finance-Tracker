@@ -29,6 +29,23 @@ const TRACKER_ICONS = [
   { name: 'DollarSign', component: DollarSign },
 ]
 
+// Color options for tracker icon background
+// (black, sky blue, navy, yellow, orange, red, dark green, light green, pink, rose, gray, purple)
+const TRACKER_COLORS = [
+  { name: 'Black', value: '#000000' },
+  { name: 'Sky Blue', value: '#7dd3fc' },
+  { name: 'Navy', value: '#1e3a5f' },
+  { name: 'Yellow', value: '#eab308' },
+  { name: 'Orange', value: '#f59e0b' },
+  { name: 'Red', value: '#ef4444' },
+  { name: 'Dark Green', value: '#166534' },
+  { name: 'Light Green', value: '#10b981' },
+  { name: 'Pink', value: '#ec4899' },
+  { name: 'Rose', value: '#f43f5e' },
+  { name: 'Gray', value: '#736F6E' },
+  { name: 'Purple', value: '#8b5cf6' },
+]
+
 export default function TrackerDashboard() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -39,6 +56,7 @@ export default function TrackerDashboard() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editName, setEditName] = useState('')
   const [editIcon, setEditIcon] = useState('Wallet')
+  const [editColor, setEditColor] = useState('#7dd3fc')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const trackerId = Number(id)
@@ -77,9 +95,10 @@ export default function TrackerDashboard() {
   })
 
   const updateTrackerMutation = useMutation({
-    mutationFn: ({ name, icon }: { name: string; icon: string }) => trackerApi.updateTracker(trackerId, name, userId, isGuest, icon),
+    mutationFn: ({ name, icon, color }: { name: string; icon: string; color: string }) => trackerApi.updateTracker(trackerId, name, userId, isGuest, icon || 'Wallet', color || '#7dd3fc'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tracker', trackerId, userId, isGuest] })
+      queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       setShowEditModal(false)
     },
   })
@@ -88,6 +107,7 @@ export default function TrackerDashboard() {
     if (tracker) {
       setEditName(tracker.name)
       setEditIcon(tracker.icon || 'Wallet')
+      setEditColor(tracker.color || '#7dd3fc')
     }
   }, [tracker])
 
@@ -360,11 +380,14 @@ export default function TrackerDashboard() {
             icon={editIcon}
             onNameChange={setEditName}
             onIconChange={setEditIcon}
-            onSave={() => updateTrackerMutation.mutate({ name: editName, icon: editIcon })}
+            color={editColor}
+            onColorChange={setEditColor}
+            onSave={() => updateTrackerMutation.mutate({ name: editName, icon: editIcon, color: editColor })}
             onCancel={() => {
               setShowEditModal(false)
               setEditName(tracker.name)
               setEditIcon(tracker.icon || 'Wallet')
+              setEditColor(tracker.color || '#7dd3fc')
               setShowDeleteConfirm(false)
             }}
             onDelete={() => deleteTrackerMutation.mutate()}
@@ -700,8 +723,10 @@ function AddTransactionModal({
 function EditTrackerModal({
   name,
   icon,
+  color,
   onNameChange,
   onIconChange,
+  onColorChange,
   onSave,
   onCancel,
   onDelete,
@@ -737,25 +762,63 @@ function EditTrackerModal({
               const IconComponent = iconOption.component
               const isSelected = icon === iconOption.name
               return (
-                <motion.button
+                <button
                   key={iconOption.name}
                   type="button"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => onIconChange(iconOption.name)}
-                  className={`p-3 rounded-lg border-2 transition-all ${
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onIconChange(iconOption.name)
+                  }}
+                  className={`p-3 rounded-lg border-2 transition-all cursor-pointer relative z-10 min-w-[48px] min-h-[48px] flex items-center justify-center ${
                     isSelected
-                      ? 'border-indigo-600 bg-indigo-50'
-                      : 'border-gray-200 hover:border-indigo-300'
+                      ? 'border-indigo-600 bg-indigo-100 shadow-md'
+                      : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
                   }`}
                 >
-                  <IconComponent className={`w-5 h-5 mx-auto ${
+                  <IconComponent className={`w-5 h-5 ${
                     isSelected ? 'text-indigo-600' : 'text-gray-600'
                   }`} />
-                </motion.button>
+                </button>
               )
             })}
           </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Selected: {icon}
+          </p>
+        </div>
+
+        {/* Color Selection */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600 mb-2">
+            Choose Icon Color
+          </label>
+          <div className="grid grid-cols-6 gap-2">
+            {TRACKER_COLORS.map((colorOption) => {
+              const isSelected = color === colorOption.value
+              return (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onColorChange(colorOption.value)
+                  }}
+                  className={`w-10 h-10 rounded-lg border-2 transition-all cursor-pointer relative z-10 ${
+                    isSelected
+                      ? 'border-indigo-600 shadow-lg scale-110'
+                      : 'border-gray-200 hover:border-indigo-300 hover:scale-105'
+                  }`}
+                  style={{ backgroundColor: colorOption.value }}
+                  title={colorOption.name}
+                />
+              )
+            })}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Selected: {TRACKER_COLORS.find(c => c.value === color)?.name || 'Sky Blue'}
+          </p>
         </div>
 
         <div className="flex gap-3 mb-4">

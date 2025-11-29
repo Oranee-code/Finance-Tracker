@@ -32,12 +32,14 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const { userId, isGuest } = getUserId(req)
-    const { name, icon } = req.body
+    const { name, icon, color } = req.body
     if (!name) {
       res.status(StatusCodes.BAD_REQUEST).json({ message: 'Name is required' })
       return
     }
-    const id = await db.addTracker({ name, icon: icon || 'Wallet', user_id: userId, is_guest: isGuest })
+    const iconToSave = icon && icon.trim() ? icon.trim() : 'Wallet'
+    const colorToSave = color && color.trim() ? color.trim() : '#7dd3fc'
+    const id = await db.addTracker({ name, icon: iconToSave, color: colorToSave, user_id: userId, is_guest: isGuest })
     res.status(StatusCodes.CREATED).json({ id })
   } catch (err) {
     next(err)
@@ -47,10 +49,15 @@ router.post('/', async (req, res, next) => {
 router.patch('/:id', async (req, res, next) => {
   try {
     const { userId, isGuest } = getUserId(req)
-    const { name, icon } = req.body
-    const updates: { name?: string; icon?: string } = {}
+    const { name, icon, color } = req.body
+    const updates: { name?: string; icon?: string; color?: string } = {}
     if (name !== undefined) updates.name = name
-    if (icon !== undefined) updates.icon = icon
+    if (icon !== undefined) {
+      updates.icon = icon && icon.trim() ? icon.trim() : 'Wallet'
+    }
+    if (color !== undefined) {
+      updates.color = color && color.trim() ? color.trim() : '#7dd3fc'
+    }
     await db.updateTracker(Number(req.params.id), userId, isGuest, updates)
     res.sendStatus(StatusCodes.NO_CONTENT)
   } catch (err) {

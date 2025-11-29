@@ -4,6 +4,7 @@ export interface Tracker {
   id: number
   name: string
   icon?: string
+  color?: string
   user_id: string
   is_guest: boolean
   created_at: string
@@ -25,6 +26,7 @@ export async function getTrackerById(id: number, userId: string, isGuest: boolea
 export async function addTracker(tracker: {
   name: string
   icon?: string
+  color?: string
   user_id: string
   is_guest: boolean
 }) {
@@ -36,7 +38,7 @@ export async function updateTracker(
   id: number,
   userId: string,
   isGuest: boolean,
-  updates: { name?: string; icon?: string }
+  updates: { name?: string; icon?: string; color?: string }
 ) {
   return connection('trackers')
     .where({ id, user_id: userId, is_guest: isGuest })

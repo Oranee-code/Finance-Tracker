@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Plus, Wallet, PieChart as PieChartIcon, TrendingUp, Sparkles, DollarSign, CreditCard, PiggyBank, Briefcase, Home as HomeIcon, ShoppingBag, Car, Heart, Star, Target, Building2 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
 import * as transactionApi from '../apis/transactions.ts'
@@ -36,6 +36,23 @@ const TRACKER_ICONS = [
   { name: 'DollarSign', component: DollarSign },
 ]
 
+// Color options for tracker icon background 
+const TRACKER_COLORS = [
+  { name: 'Black', value: '#000000' },
+  { name: 'Navy', value: '#1e3a5f' },
+  { name: 'Purple', value: '#8b5cf6' },
+  { name: 'Sky Blue', value: '#7dd3fc' },
+  { name: 'Yellow', value: '#ffd700' },
+  { name: 'Orange', value: '#ff8c00' },
+  { name: 'Red', value: '#ef4444' },
+  { name: 'Dark Green', value: '#166534' },
+  { name: 'Light Green', value: '#10b981' },
+  { name: 'Pink', value: '#ec4899' },
+  { name: 'Rose', value: '#ffb6c1' },
+  { name: 'Gray', value: '#a9a9a9' },
+  
+]
+
 export default function Home() {
   const { userId, isGuest } = useUserInfo()
   const navigate = useNavigate()
@@ -43,6 +60,16 @@ export default function Home() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [trackerName, setTrackerName] = useState('')
   const [selectedIcon, setSelectedIcon] = useState('Wallet')
+  const [selectedColor, setSelectedColor] = useState('#7dd3fc')
+
+  // Reset icon and color when modal opens
+  useEffect(() => {
+    if (showAddModal) {
+      setSelectedIcon('Wallet')
+      setSelectedColor('#7dd3fc')
+    }
+  }, [showAddModal])
+
 
   const { data: trackers = [], isLoading } = useQuery({
     queryKey: ['trackers', userId, isGuest],
@@ -64,19 +91,22 @@ export default function Home() {
   })
 
   const addMutation = useMutation({
-    mutationFn: ({ name, icon }: { name: string; icon: string }) => trackerApi.addTracker(name, userId, isGuest, icon),
+    mutationFn: ({ name, icon, color }: { name: string; icon: string; color: string }) => trackerApi.addTracker(name, userId, isGuest, icon, color),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       setShowAddModal(false)
       setTrackerName('')
       setSelectedIcon('Wallet')
+      setSelectedColor('#7dd3fc')
     },
   })
 
   const handleAddTracker = (e: React.FormEvent) => {
     e.preventDefault()
     if (trackerName.trim()) {
-      addMutation.mutate({ name: trackerName.trim(), icon: selectedIcon })
+      const iconToSend = selectedIcon || 'Wallet'
+      const colorToSend = selectedColor || '#7dd3fc'
+      addMutation.mutate({ name: trackerName.trim(), icon: iconToSend, color: colorToSend })
     }
   }
 
@@ -378,29 +408,61 @@ export default function Home() {
                 {/* Icon Selection */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-luxury-navy mb-3">
-                    Choose an Icon
+                    Icon
                   </label>
                   <div className="grid grid-cols-6 gap-2">
                     {TRACKER_ICONS.map((icon) => {
                       const IconComponent = icon.component
                       const isSelected = selectedIcon === icon.name
                       return (
-                        <motion.button
+                        <button
                           key={icon.name}
                           type="button"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedIcon(icon.name)}
-                          className={`p-3 rounded-xl border-2 transition-all ${
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setSelectedIcon(icon.name)
+                          }}
+                          className={`p-3 rounded-xl border-2 transition-all cursor-pointer relative z-10 min-w-[48px] min-h-[48px] flex items-center justify-center ${
                             isSelected
-                              ? 'border-luxury-teal bg-luxury-teal/10'
-                              : 'border-luxury-beige hover:border-luxury-teal/50'
+                              ? 'border-luxury-teal bg-luxury-teal/20 shadow-md'
+                              : 'border-luxury-beige hover:border-luxury-teal/50 hover:bg-luxury-beige/50'
                           }`}
                         >
-                          <IconComponent className={`w-6 h-6 mx-auto ${
+                          <IconComponent className={`w-6 h-6 ${
                             isSelected ? 'text-luxury-teal' : 'text-luxury-navy/60'
                           }`} />
-                        </motion.button>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Color Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-luxury-navy mb-3">
+                    Color
+                  </label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {TRACKER_COLORS.map((color) => {
+                      const isSelected = selectedColor === color.value
+                      return (
+                        <button
+                          key={color.value}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setSelectedColor(color.value)
+                          }}
+                          className={`w-10 h-10 rounded-lg border-2 transition-all cursor-pointer relative z-10 ${
+                            isSelected
+                              ? 'border-luxury-navy shadow-lg scale-110'
+                              : 'border-luxury-beige hover:border-luxury-navy/50 hover:scale-105'
+                          }`}
+                          style={{ backgroundColor: color.value }}
+                          title={color.name}
+                        />
                       )
                     })}
                   </div>
@@ -422,6 +484,7 @@ export default function Home() {
                       setShowAddModal(false)
                       setTrackerName('')
                       setSelectedIcon('Wallet')
+                      setSelectedColor('#3b82f6')
                     }}
                     className="flex-1 bg-luxury-beige hover:bg-luxury-beige/80 text-luxury-navy font-semibold py-3 px-4 rounded-xl transition-colors"
                   >
@@ -481,6 +544,7 @@ function TrackerCard({
   const hasSpendingData = miniChartData.length > 0
   const netBalance = summary?.balance || 0
   const IconComponent = getIconComponent(tracker.icon)
+  const iconColor = tracker.color || '#3b82f6'
 
   return (
     <motion.div
@@ -496,8 +560,11 @@ function TrackerCard({
         <h3 className="text-xl font-serif font-semibold text-luxury-navy">
           {tracker.name}
         </h3>
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-luxury-teal to-luxury-teal-light flex items-center justify-center">
-          <IconComponent className="w-5 h-5 text-black" />
+        <div 
+          className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
+          style={{ backgroundColor: iconColor }}
+        >
+          <IconComponent className="w-5 h-5 text-white" />
         </div>
       </div>
 

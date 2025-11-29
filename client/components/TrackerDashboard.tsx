@@ -30,20 +30,20 @@ const TRACKER_ICONS = [
 ]
 
 // Color options for tracker icon background
-// (black, sky blue, navy, yellow, orange, red, dark green, light green, pink, rose, gray, purple)
+
 const TRACKER_COLORS = [
   { name: 'Black', value: '#000000' },
-  { name: 'Sky Blue', value: '#7dd3fc' },
   { name: 'Navy', value: '#1e3a5f' },
-  { name: 'Yellow', value: '#eab308' },
-  { name: 'Orange', value: '#f59e0b' },
+  { name: 'Purple', value: '#8b5cf6' },
+  { name: 'Sky Blue', value: '#7dd3fc' },
+  { name: 'Yellow', value: '#ffd700' },
+  { name: 'Orange', value: '#ff8c00' },
   { name: 'Red', value: '#ef4444' },
   { name: 'Dark Green', value: '#166534' },
   { name: 'Light Green', value: '#10b981' },
   { name: 'Pink', value: '#ec4899' },
-  { name: 'Rose', value: '#f43f5e' },
-  { name: 'Gray', value: '#736F6E' },
-  { name: 'Purple', value: '#8b5cf6' },
+  { name: 'Rose', value: '#ffb6c1' },
+  { name: 'Gray', value: '#a9a9a9' },
 ]
 
 export default function TrackerDashboard() {
@@ -755,7 +755,7 @@ function EditTrackerModal({
         {/* Icon Selection */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-600 mb-2">
-            Choose an Icon
+            Icon
           </label>
           <div className="grid grid-cols-6 gap-2">
             {TRACKER_ICONS.map((iconOption) => {
@@ -783,15 +783,13 @@ function EditTrackerModal({
               )
             })}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Selected: {icon}
-          </p>
+          
         </div>
 
         {/* Color Selection */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-600 mb-2">
-            Choose Icon Color
+            Color
           </label>
           <div className="grid grid-cols-6 gap-2">
             {TRACKER_COLORS.map((colorOption) => {
@@ -816,9 +814,7 @@ function EditTrackerModal({
               )
             })}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Selected: {TRACKER_COLORS.find(c => c.value === color)?.name || 'Sky Blue'}
-          </p>
+          
         </div>
 
         <div className="flex gap-3 mb-4">

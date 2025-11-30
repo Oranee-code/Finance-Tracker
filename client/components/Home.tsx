@@ -63,6 +63,7 @@ export default function Home() {
             trackers={trackers}
             userId={userId}
             isGuest={isGuest}
+            accessToken={accessToken}
             onAddTracker={() => setShowAddModal(true)}
           />
         )}

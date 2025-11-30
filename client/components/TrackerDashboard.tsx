@@ -49,7 +49,7 @@ const TRACKER_COLORS = [
 export default function TrackerDashboard() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { userId, isGuest } = useUserInfo()
+  const { userId, isGuest, accessToken } = useUserInfo()
   const queryClient = useQueryClient()
   const [showAddModal, setShowAddModal] = useState(false)
   const [transactionType, setTransactionType] = useState<'income' | 'expense'>('expense')

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
 
 export default function Login() {
-  const { loginWithRedirect, isLoading, error } = useAuth0()
+  const { loginWithRedirect, isLoading, error, isAuthenticated } = useAuth0()
   const { signInAsGuest, hasPreviousGuestData } = useGuestAuth()
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -17,9 +17,20 @@ export default function Login() {
     }
   }, [error])
 
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate]) 
+
   const handleLogin = () => {
     setErrorMessage('')
-    loginWithRedirect().catch((err) => {
+    loginWithRedirect({
+      appState: {
+        returnTo: window.location.pathname || '/',
+      },
+    }).catch((err) => {
       console.error('Login error:', err)
       setErrorMessage(err.message || 'Failed to redirect to login')
     })

@@ -27,7 +27,11 @@ if (audience && audience.trim() !== '' && !audience.includes('/api/v2/')) {
   jwtConfig.audience = audience
 }
 
-const checkJwt = jwt(jwtConfig)
+const checkJwt = jwt({
+  ...jwtConfig,
+  // Don't fail if no token is present - we support guest users
+  credentialsRequired: false,
+})
 
 export default checkJwt
 

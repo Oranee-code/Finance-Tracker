@@ -2,19 +2,30 @@ import request from 'superagent'
 
 const baseUrl = '/api/v1/trackers'
 
-export async function getTrackers(userId: string, isGuest: boolean) {
-  const res = await request
-    .get(baseUrl)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+// Helper to set headers based on auth type
+function setAuthHeaders(req: request.SuperAgentRequest, userId: string, isGuest: boolean, accessToken?: string | null) {
+  if (isGuest) {
+    return req
+      .set('X-Guest-Id', userId)
+      .set('X-Is-Guest', 'true')
+  } else if (accessToken) {
+    return req
+      .set('Authorization', `Bearer ${accessToken}`)
+  }
+  return req
+}
+
+export async function getTrackers(userId: string, isGuest: boolean, accessToken?: string | null) {
+  const req = request.get(baseUrl)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req
   return res.body
 }
 
-export async function getTracker(id: number, userId: string, isGuest: boolean) {
-  const res = await request
-    .get(`${baseUrl}/${id}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+export async function getTracker(id: number, userId: string, isGuest: boolean, accessToken?: string | null) {
+  const req = request.get(`${baseUrl}/${id}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req
   return res.body
 }
 
@@ -23,13 +34,12 @@ export async function addTracker(
   userId: string,
   isGuest: boolean,
   icon?: string,
-  color?: string
+  color?: string,
+  accessToken?: string | null
 ) {
-  const res = await request
-    .post(baseUrl)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
-    .send({ name, icon, color })
+  const req = request.post(baseUrl)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req.send({ name, icon, color })
   return res.body
 }
 
@@ -39,23 +49,22 @@ export async function updateTracker(
   userId: string,
   isGuest: boolean,
   icon?: string,
-  color?: string
+  color?: string,
+  accessToken?: string | null
 ) {
-  await request
-    .patch(`${baseUrl}/${id}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
-    .send({ name, icon, color })
+  const req = request.patch(`${baseUrl}/${id}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  await req.send({ name, icon, color })
 }
 
 export async function deleteTracker(
   id: number,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  await request
-    .delete(`${baseUrl}/${id}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+  const req = request.delete(`${baseUrl}/${id}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  await req
 }
 

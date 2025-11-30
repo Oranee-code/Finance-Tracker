@@ -2,39 +2,52 @@ import request from 'superagent'
 
 const baseUrl = '/api/v1/transactions'
 
+// Helper to set headers based on auth type
+function setAuthHeaders(req: request.SuperAgentRequest, userId: string, isGuest: boolean, accessToken?: string | null) {
+  if (isGuest) {
+    return req
+      .set('X-Guest-Id', userId)
+      .set('X-Is-Guest', 'true')
+  } else if (accessToken) {
+    return req
+      .set('Authorization', `Bearer ${accessToken}`)
+  }
+  return req
+}
+
 export async function getTransactions(
   trackerId: number,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  const res = await request
-    .get(`${baseUrl}/tracker/${trackerId}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+  const req = request.get(`${baseUrl}/tracker/${trackerId}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req
   return res.body
 }
 
 export async function getTransactionSummary(
   trackerId: number,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  const res = await request
-    .get(`${baseUrl}/tracker/${trackerId}/summary`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+  const req = request.get(`${baseUrl}/tracker/${trackerId}/summary`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req
   return res.body
 }
 
 export async function getCategorySpending(
   trackerId: number,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  const res = await request
-    .get(`${baseUrl}/tracker/${trackerId}/categories`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+  const req = request.get(`${baseUrl}/tracker/${trackerId}/categories`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req
   return res.body
 }
 
@@ -49,13 +62,12 @@ export async function addTransaction(
     notes?: string
   },
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  const res = await request
-    .post(baseUrl)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
-    .send(transaction)
+  const req = request.post(baseUrl)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  const res = await req.send(transaction)
   return res.body
 }
 
@@ -69,23 +81,22 @@ export async function updateTransaction(
     notes?: string
   },
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  await request
-    .patch(`${baseUrl}/${id}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
-    .send(updates)
+  const req = request.patch(`${baseUrl}/${id}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  await req.send(updates)
 }
 
 export async function deleteTransaction(
   id: number,
   userId: string,
-  isGuest: boolean
+  isGuest: boolean,
+  accessToken?: string | null
 ) {
-  await request
-    .delete(`${baseUrl}/${id}`)
-    .set('X-Guest-Id', userId)
-    .set('X-Is-Guest', isGuest.toString())
+  const req = request.delete(`${baseUrl}/${id}`)
+  setAuthHeaders(req, userId, isGuest, accessToken)
+  await req
 }
 

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { CircleUserRound } from 'lucide-react'
-import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
+import { useGuestAuth } from './GuestAuthContext.tsx'
 import GuestProfileModal from './GuestProfileModal.tsx'
 
 export default function LogoutButton() {

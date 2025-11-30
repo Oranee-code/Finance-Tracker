@@ -8,19 +8,19 @@ import Dashboard from './Dashboard.tsx'
 import AddTrackerModal from './AddTrackerModal.tsx'
 
 export default function Home() {
-  const { userId, isGuest, accessToken } = useUserInfo()
+  const { userId, isGuest } = useUserInfo()
   const queryClient = useQueryClient()
   const [showAddModal, setShowAddModal] = useState(false)
 
   const { data: trackers = [], isLoading } = useQuery({
     queryKey: ['trackers', userId, isGuest],
-    queryFn: () => trackerApi.getTrackers(userId, isGuest, accessToken),
+    queryFn: () => trackerApi.getTrackers(userId, isGuest),
     enabled: !!userId, // Only fetch if user is authenticated or is a guest
   })
 
   const addMutation = useMutation({
     mutationFn: ({ name, icon, color }: { name: string; icon: string; color: string }) => 
-      trackerApi.addTracker(name, userId, isGuest, icon, color, accessToken),
+      trackerApi.addTracker(name, userId, isGuest, icon, color),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       setShowAddModal(false)
@@ -63,7 +63,6 @@ export default function Home() {
             trackers={trackers}
             userId={userId}
             isGuest={isGuest}
-            accessToken={accessToken}
             onAddTracker={() => setShowAddModal(true)}
           />
         )}

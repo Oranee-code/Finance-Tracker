@@ -2,13 +2,8 @@ import { Router } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import * as db from '../db/categories.ts'
 import { getUserId } from '../utils.ts'
-import checkJwt from '../auth0.ts'
 
 const router = Router()
-
-// Apply JWT verification middleware (optional - won't fail if no token)
-// This allows both Auth0 users and guest users
-router.use(checkJwt)
 
 router.get('/', async (req, res, next) => {
   try {

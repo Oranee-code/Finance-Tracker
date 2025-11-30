@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
+import { useGuestAuth } from './GuestAuthContext.tsx'
 import { User, Trash2, LogOut } from 'lucide-react'
 
 interface GuestProfileModalProps {

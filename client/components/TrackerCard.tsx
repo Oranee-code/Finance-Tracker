@@ -34,7 +34,6 @@ interface TrackerCardProps {
   index: number
   userId: string
   isGuest: boolean
-  accessToken: string | null
   onClick: () => void
 }
 
@@ -42,20 +41,19 @@ export default function TrackerCard({
   tracker, 
   index, 
   userId, 
-  isGuest,
-  accessToken,
+  isGuest, 
   onClick 
 }: TrackerCardProps) {
   // Fetch category spending for this tracker
   const { data: categorySpending = [] } = useQuery({
     queryKey: ['categorySpending', tracker.id, userId, isGuest],
-    queryFn: () => transactionApi.getCategorySpending(tracker.id, userId, isGuest, accessToken),
+    queryFn: () => transactionApi.getCategorySpending(tracker.id, userId, isGuest),
   })
 
   // Fetch summary for net balance
   const { data: summary } = useQuery({
     queryKey: ['summary', tracker.id, userId, isGuest],
-    queryFn: () => transactionApi.getTransactionSummary(tracker.id, userId, isGuest, accessToken),
+    queryFn: () => transactionApi.getTransactionSummary(tracker.id, userId, isGuest),
   })
 
   // Prepare mini chart data

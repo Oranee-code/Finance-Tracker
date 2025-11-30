@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { Navigate } from 'react-router-dom'
 import Login from './Login'
-import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
+import { useGuestAuth } from './GuestAuthContext.tsx'
 
 interface ProtectedRouteProps {
   children: React.ReactNode

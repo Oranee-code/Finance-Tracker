@@ -22,7 +22,6 @@ export function getUserId(req: Request): { userId: string; isGuest: boolean } {
     console.warn('No user ID found. Headers:', {
       'x-is-guest': req.headers['x-is-guest'],
       'x-guest-id': req.headers['x-guest-id'],
-      'authorization': req.headers['authorization'] ? 'present' : 'missing',
       'auth': authReq.auth,
     })
   }

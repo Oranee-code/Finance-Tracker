@@ -11,11 +11,10 @@ interface DashboardProps {
   trackers: any[]
   userId: string
   isGuest: boolean
-  accessToken: string | null
   onAddTracker: () => void
 }
 
-export default function Dashboard({ trackers, userId, isGuest, accessToken, onAddTracker }: DashboardProps) {
+export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: DashboardProps) {
   const navigate = useNavigate()
 
   return (
@@ -54,7 +53,6 @@ export default function Dashboard({ trackers, userId, isGuest, accessToken, onAd
             index={index}
             userId={userId}
             isGuest={isGuest}
-            accessToken={accessToken}
             onClick={() => navigate(`/tracker/${tracker.id}`)}
           />
         ))}

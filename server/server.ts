@@ -9,14 +9,11 @@ import categoryRoutes from './routes/categories.ts'
 
 const server = express()
 
-// Enable CORS
-// In production, allow same-origin requests (served from same domain)
-// In development, allow all origins for local testing
 server.use(
   cors({
     origin: process.env.NODE_ENV === 'production' 
-      ? process.env.CORS_ORIGIN || true  // Use env var or allow all in production
-      : true,  // Allow all origins in development
+      ? process.env.CORS_ORIGIN || true  
+      : true,  
     credentials: true,
   })
 )

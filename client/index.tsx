@@ -5,8 +5,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import routes from './routes.tsx'
 import { Auth0Provider } from '@auth0/auth0-react'
-import { auth0Config } from './config/auth0.ts'
-import { GuestAuthProvider } from './contexts/GuestAuthContext.tsx'
+import { auth0Config } from './components/auth0.ts'
+import { GuestAuthProvider } from './components/GuestAuthContext.tsx'
 
 const router = createBrowserRouter(routes)
 const queryClient = new QueryClient()
@@ -16,10 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
     <Auth0Provider
       domain={auth0Config.domain}
       clientId={auth0Config.clientId}
-      authorizationParams={{
-        redirect_uri: auth0Config.redirectUri,
-        ...(auth0Config.audience && { audience: auth0Config.audience }),
-      }}
+      authorizationParams={
+        auth0Config.audience
+          ? {
+              redirect_uri: auth0Config.redirectUri,
+              audience: auth0Config.audience,
+            }
+          : {
+              redirect_uri: auth0Config.redirectUri,
+            }
+      }
     >
       <GuestAuthProvider>
       <QueryClientProvider client={queryClient}>

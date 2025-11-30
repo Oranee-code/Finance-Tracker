@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useGuestAuth } from '../contexts/GuestAuthContext.tsx'
+import { useGuestAuth } from './GuestAuthContext.tsx'
 
 export default function Login() {
   const { loginWithRedirect, isLoading, error, isAuthenticated } = useAuth0()
@@ -12,6 +12,7 @@ export default function Login() {
 
   useEffect(() => {
     if (error) {
+    
       console.error('Auth0 Error:', error)
       setErrorMessage(error.message || 'An error occurred during authentication')
     }

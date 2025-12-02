@@ -16,6 +16,7 @@ export default {
     },
   },
 
+  
   test: {
     client: 'sqlite3',
     useNullAsDefault: true,

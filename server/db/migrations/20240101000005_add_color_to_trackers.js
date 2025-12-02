@@ -3,7 +3,7 @@
  */
 export async function up(knex) {
   return knex.schema.alterTable('trackers', (table) => {
-    table.string('color').defaultTo('#0d9488') // Default to luxury-teal
+    table.string('color').defaultTo('#0d9488')
   })
 }
 
@@ -15,4 +15,3 @@ export async function down(knex) {
     table.dropColumn('color')
   })
 }
-

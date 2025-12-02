@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart, Wallet, CreditCard, PiggyBank, Briefcase, Home, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign } from 'lucide-react'
+import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart, Wallet, CreditCard, PiggyBank, Briefcase, Home, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign, ChevronDown } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
 import * as transactionApi from '../apis/transactions.ts'
 import * as categoryApi from '../apis/categories.ts'
 import { useUserInfo } from '../hooks/useUserInfo.ts'
-import { format } from 'date-fns'
+import { format, startOfDay, endOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, addMonths, addDays } from 'date-fns'
 import moneyBg from '../../Image/Money BG2.jpg'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6']
@@ -58,6 +58,16 @@ export default function TrackerDashboard() {
   const [editIcon, setEditIcon] = useState('Wallet')
   const [editColor, setEditColor] = useState('#7dd3fc')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [dateRangeType, setDateRangeType] = useState<'day' | 'week' | 'fortnight' | 'month' | 'year' | 'custom' | 'all'>('all')
+  const [customStartDate, setCustomStartDate] = useState<string>('')
+  const [customEndDate, setCustomEndDate] = useState<string>('')
+  const [dayStartDate, setDayStartDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
+  const [weekStartDay, setWeekStartDay] = useState<number>(1) // 0=Sunday, 1=Monday, etc.
+  const [fortnightStartDate, setFortnightStartDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
+  const [monthStartDate, setMonthStartDate] = useState<string>(format(new Date(), 'yyyy-MM'))
+  const [showDateRangeDropdown, setShowDateRangeDropdown] = useState(false)
+  const [tempCustomStartDate, setTempCustomStartDate] = useState<string>('')
+  const [tempCustomEndDate, setTempCustomEndDate] = useState<string>('')
 
   const trackerId = Number(id)
 
@@ -111,35 +121,152 @@ export default function TrackerDashboard() {
     }
   }, [tracker])
 
-  const chartData = categorySpending.map((cat: any) => ({
-    name: cat.category_name || 'Uncategorized',
-    value: Number(cat.total),
-  }))
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showDateRangeDropdown && !target.closest('.date-range-dropdown')) {
+        setShowDateRangeDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showDateRangeDropdown])
+
+  // Initialize temporary custom date values when dropdown opens or custom range is selected
+  useEffect(() => {
+    if (showDateRangeDropdown && dateRangeType === 'custom') {
+      setTempCustomStartDate(customStartDate || '')
+      setTempCustomEndDate(customEndDate || '')
+    }
+  }, [showDateRangeDropdown, dateRangeType, customStartDate, customEndDate])
 
   const incomeCategories = categories.filter((c: any) => c.type === 'income')
   const expenseCategories = categories.filter((c: any) => c.type === 'expense')
 
-  // Show and Calculate date range from transactions
-  const getDateRange = () => {
-    if (transactions.length === 0) return null
+  // Calculate date range based on selected type
+  const getDateRangeForType = (): { start: Date; end: Date } | null => {
+    const now = new Date()
     
-    const dates = transactions
-      .map((t: any) => new Date(t.transaction_date))
-      .filter((date: Date) => !isNaN(date.getTime()))
-      .sort((a: Date, b: Date) => a.getTime() - b.getTime())
-    
-    if (dates.length === 0) return null
-    
-    const earliest = dates[0]
-    const latest = dates[dates.length - 1]
-    
-    return {
-      start: earliest,
-      end: latest,
+    switch (dateRangeType) {
+      case 'day':
+        if (dayStartDate) {
+          const selectedDate = new Date(dayStartDate)
+          return {
+            start: startOfDay(selectedDate),
+            end: endOfDay(selectedDate),
+          }
+        }
+        return {
+          start: startOfDay(now),
+          end: endOfDay(now),
+        }
+      case 'week':
+        return {
+          start: startOfWeek(now, { weekStartsOn: weekStartDay as 0 | 1 | 2 | 3 | 4 | 5 | 6 }),
+          end: endOfWeek(now, { weekStartsOn: weekStartDay as 0 | 1 | 2 | 3 | 4 | 5 | 6 }),
+        }
+      case 'fortnight':
+        if (fortnightStartDate) {
+          const startDate = new Date(fortnightStartDate)
+          // Fortnight = 14 days (start date + 13 more days)
+          return {
+            start: startOfDay(startDate),
+            end: endOfDay(addDays(startDate, 13)),
+          }
+        }
+        return {
+          start: startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 }),
+          end: endOfWeek(now, { weekStartsOn: 1 }),
+        }
+      case 'month':
+        if (monthStartDate) {
+          const startDate = new Date(monthStartDate + '-01')
+          return {
+            start: startOfMonth(startDate),
+            end: endOfMonth(startDate),
+          }
+        }
+        return {
+          start: startOfMonth(now),
+          end: endOfMonth(now),
+        }
+      case 'year':
+        return {
+          start: startOfYear(now),
+          end: endOfYear(now),
+        }
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          return {
+            start: startOfDay(new Date(customStartDate)),
+            end: endOfDay(new Date(customEndDate)),
+          }
+        }
+        return null
+      case 'all':
+      default:
+        if (transactions.length === 0) return null
+        const dates = transactions
+          .map((t: any) => new Date(t.transaction_date))
+          .filter((date: Date) => !isNaN(date.getTime()))
+          .sort((a: Date, b: Date) => a.getTime() - b.getTime())
+        if (dates.length === 0) return null
+        return {
+          start: dates[0],
+          end: dates[dates.length - 1],
+        }
     }
   }
 
-  const dateRange = getDateRange()
+  const dateRange = getDateRangeForType()
+
+  // Filter transactions based on date range
+  const filteredTransactions = dateRange
+    ? transactions.filter((t: any) => {
+        const transactionDate = new Date(t.transaction_date)
+        return transactionDate >= dateRange.start && transactionDate <= dateRange.end
+      })
+    : transactions
+
+  // Recalculate summary from filtered transactions
+  const filteredSummary = filteredTransactions.reduce(
+    (acc: any, t: any) => {
+      if (t.type === 'income') {
+        acc.totalIncome += Number(t.amount)
+      } else {
+        acc.totalExpenses += Number(t.amount)
+      }
+      return acc
+    },
+    { totalIncome: 0, totalExpenses: 0, balance: 0 }
+  )
+  filteredSummary.balance = filteredSummary.totalIncome - filteredSummary.totalExpenses
+
+  // Recalculate category spending from filtered transactions
+  const filteredCategorySpending = filteredTransactions.reduce((acc: any, t: any) => {
+    if (t.type === 'expense') {
+      const categoryName = t.category_name || 'Uncategorized'
+      if (!acc[categoryName]) {
+        acc[categoryName] = 0
+      }
+      acc[categoryName] += Number(t.amount)
+    }
+    return acc
+  }, {})
+
+  const filteredChartData = Object.entries(filteredCategorySpending).map(([name, value]) => ({
+    name,
+    value: Number(value),
+  }))
+
+  // Use filtered data for charts, fallback to original if no filter
+  const chartData = dateRangeType === 'all' 
+    ? categorySpending.map((cat: any) => ({
+        name: cat.category_name || 'Uncategorized',
+        value: Number(cat.total),
+      }))
+    : filteredChartData
 
   if (!tracker) {
     return (
@@ -200,7 +327,7 @@ export default function TrackerDashboard() {
               <h3 className="text-sm font-medium text-green-800">Total Income</h3>
             </div>
             <p className="text-3xl font-bold text-green-700">
-              ${summary?.totalIncome?.toFixed(2) || '0.00'}
+              ${(dateRangeType === 'all' ? summary?.totalIncome : filteredSummary.totalIncome)?.toFixed(2) || '0.00'}
             </p>
           </motion.div>
 
@@ -215,7 +342,7 @@ export default function TrackerDashboard() {
               <h3 className="text-sm font-medium text-red-800">Total Expenses</h3>
             </div>
             <p className="text-3xl font-bold text-red-700">
-              ${summary?.totalExpenses?.toFixed(2) || '0.00'}
+              ${(dateRangeType === 'all' ? summary?.totalExpenses : filteredSummary.totalExpenses)?.toFixed(2) || '0.00'}
             </p>
           </motion.div>
 
@@ -224,21 +351,21 @@ export default function TrackerDashboard() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
             className={`rounded-lg p-6 border ${
-              (summary?.balance || 0) >= 0
+              ((dateRangeType === 'all' ? summary?.balance : filteredSummary.balance) || 0) >= 0
                 ? 'bg-blue-50 border-blue-200'
                 : 'bg-orange-50 border-orange-200'
             }`}
           >
             <div className="flex items-center gap-2 mb-2">
-              <Landmark className={`w-5 h-5 ${(summary?.balance || 0) >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
-              <h3 className={`text-sm font-medium ${(summary?.balance || 0) >= 0 ? 'text-blue-800' : 'text-orange-800'}`}>Total Balance</h3>
+              <Landmark className={`w-5 h-5 ${((dateRangeType === 'all' ? summary?.balance : filteredSummary.balance) || 0) >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
+              <h3 className={`text-sm font-medium ${((dateRangeType === 'all' ? summary?.balance : filteredSummary.balance) || 0) >= 0 ? 'text-blue-800' : 'text-orange-800'}`}>Total Balance</h3>
             </div>
             <p
               className={`text-3xl font-bold ${
-                (summary?.balance || 0) >= 0 ? 'text-blue-700' : 'text-orange-700'
+                ((dateRangeType === 'all' ? summary?.balance : filteredSummary.balance) || 0) >= 0 ? 'text-blue-700' : 'text-orange-700'
               }`}
             >
-              ${summary?.balance?.toFixed(2) || '0.00'}
+              ${(dateRangeType === 'all' ? summary?.balance : filteredSummary.balance)?.toFixed(2) || '0.00'}
             </p>
           </motion.div>
         </div>
@@ -271,12 +398,196 @@ export default function TrackerDashboard() {
               Add Expense
             </motion.button>
           </div>
-          {dateRange && (
-            <p className="text-xl text-gray-800 mt-6 mb-6 flex items-center gap-6 ">
-              <CalendarHeart className="w-6 h-6 inline-block mb-2" />
-              <span>{format(dateRange.start, 'd MMM yyyy')} - {format(dateRange.end, 'd MMM yyyy')}</span>
-            </p>
-          )}
+          <div className="mt-4 mb-2">
+            <div className="relative date-range-dropdown inline-block">
+              <button
+                onClick={() => setShowDateRangeDropdown(!showDateRangeDropdown)}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-sm font-medium text-gray-700">Date Ranges</span>
+                <ChevronDown className="w-5 h-10 text-gray-500" />
+              </button>
+              {showDateRangeDropdown && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[280px] p-4">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Select Range</label>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setDateRangeType('all')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'all' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          All Time
+                        </button>
+                        <button
+                          onClick={() => setDateRangeType('day')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'day' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Day
+                        </button>
+                        <button
+                          onClick={() => setDateRangeType('week')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'week' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Week
+                        </button>
+                        <button
+                          onClick={() => setDateRangeType('fortnight')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'fortnight' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Fortnight
+                        </button>
+                        <button
+                          onClick={() => setDateRangeType('month')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'month' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Month
+                        </button>
+                        <button
+                          onClick={() => setDateRangeType('year')}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'year' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Year
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDateRangeType('custom')
+                            // Initialize temp values when selecting custom range
+                            if (!tempCustomStartDate && !tempCustomEndDate) {
+                              setTempCustomStartDate(customStartDate || '')
+                              setTempCustomEndDate(customEndDate || '')
+                            }
+                          }}
+                          className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+                            dateRangeType === 'custom' ? 'bg-blue-50 text-blue-700 font-medium border-2 border-blue-500' : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          Custom Range
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {dateRangeType === 'day' && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Select Date:</label>
+                        <input
+                          type="date"
+                          value={dayStartDate}
+                          onChange={(e) => setDayStartDate(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {dateRangeType === 'week' && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">First Day of Week:</label>
+                        <select
+                          value={weekStartDay}
+                          onChange={(e) => setWeekStartDay(Number(e.target.value))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                          <option value={0}>Sunday</option>
+                          <option value={1}>Monday</option>
+                          <option value={2}>Tuesday</option>
+                          <option value={3}>Wednesday</option>
+                          <option value={4}>Thursday</option>
+                          <option value={5}>Friday</option>
+                          <option value={6}>Saturday</option>
+                        </select>
+                      </div>
+                    )}
+                    
+                    {dateRangeType === 'fortnight' && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Start Date:</label>
+                        <input
+                          type="date"
+                          value={fortnightStartDate}
+                          onChange={(e) => setFortnightStartDate(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {dateRangeType === 'month' && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Select Month:</label>
+                        <input
+                          type="month"
+                          value={monthStartDate}
+                          onChange={(e) => setMonthStartDate(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {dateRangeType === 'custom' && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Custom Range:</label>
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">Start Date:</label>
+                            <input
+                              type="date"
+                              value={tempCustomStartDate}
+                              onChange={(e) => setTempCustomStartDate(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-600 mb-1">End Date:</label>
+                            <input
+                              type="date"
+                              value={tempCustomEndDate}
+                              onChange={(e) => setTempCustomEndDate(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="pt-3 border-t border-gray-200">
+                      <button
+                        onClick={() => {
+                          // Save custom range values if custom range is selected
+                          if (dateRangeType === 'custom') {
+                            setCustomStartDate(tempCustomStartDate)
+                            setCustomEndDate(tempCustomEndDate)
+                          }
+                          setShowDateRangeDropdown(false)
+                        }}
+                        className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="mt-4 mb-6 flex items-center gap-4 flex-wrap">
+            {dateRange && (
+              <p className="text-xl text-gray-800 flex items-center gap-2">
+                <CalendarHeart className="w-6 h-6" />
+                <span>{format(dateRange.start, 'd MMM yyyy')} - {format(dateRange.end, 'd MMM yyyy')}</span>
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Charts */}
@@ -338,12 +649,12 @@ export default function TrackerDashboard() {
           className="bg-blue-50 rounded-lg shadow-md p-6"
         >
           <h3 className="text-xl font-semibold mb-4">Recent Transactions</h3>
-          {transactions.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No transactions yet</p>
+          {filteredTransactions.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">No transactions in selected period</p>
           ) : (
             <div className="space-y-3">
               <AnimatePresence>
-                {transactions.map((transaction: any, index: number) => (
+                {filteredTransactions.map((transaction: any, index: number) => (
                   <TransactionItem
                     key={transaction.id}
                     transaction={transaction}
@@ -485,6 +796,7 @@ function AddTransactionModal({
   const [categoryName, setCategoryName] = useState('')
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [notes, setNotes] = useState('')
+  const [repeat, setRepeat] = useState<string>('never')
   const [showCustomCategory, setShowCustomCategory] = useState(false)
   const [errors, setErrors] = useState<{ amount?: string; category?: string }>({})
 
@@ -540,6 +852,7 @@ function AddTransactionModal({
         : (selectedCategory?.name || categoryName.trim()),
       transaction_date: date,
       notes: notes.trim() || null,
+      repeat: repeat,
     })
   }
 
@@ -577,7 +890,7 @@ function AddTransactionModal({
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Amount</label>
+            <label className="block text-sm font-medium mb-1">Amount:</label>
             <input
               type="number"
               step="0.01"
@@ -601,7 +914,7 @@ function AddTransactionModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Category</label>
+            <label className="block text-sm font-medium mb-1">Category:</label>
             {!showCustomCategory ? (
               <>
                 <select
@@ -678,7 +991,7 @@ function AddTransactionModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Date</label>
+            <label className="block text-sm font-medium mb-1">Date:</label>
             <input
               type="date"
               value={date}
@@ -686,6 +999,23 @@ function AddTransactionModal({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Repeat:</label>
+            <select
+              value={repeat}
+              onChange={(e) => setRepeat(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="never">Never</option>
+              <option value="weekly">Weekly</option>
+              <option value="fortnightly">Fortnightly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="6months">6 Months</option>
+              <option value="yearly">Yearly</option>
+            </select>
           </div>
 
           <div>

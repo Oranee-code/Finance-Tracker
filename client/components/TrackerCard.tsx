@@ -163,7 +163,7 @@ export default function TrackerCard({
         className="w-full py-2 text-sm font-medium text-luxury-navy/70 hover:text-luxury-teal border border-luxury-sky 
         hover:border-luxury-teal/30 rounded-lg transition-colors flex items-center justify-center gap-1"
       >
-        Show More
+        + Add Transaction
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>

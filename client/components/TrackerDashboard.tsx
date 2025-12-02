@@ -732,6 +732,21 @@ function TransactionItem({
     },
   })
 
+  const formatRepeat = (repeat: string) => {
+    if (!repeat || repeat === 'never') return null
+    const repeatMap: { [key: string]: string } = {
+      'weekly': 'weekly',
+      'fortnightly': 'fortnightly',
+      'monthly': 'monthly',
+      'quarterly': 'quarterly',
+      '6months': '6 months',
+      'yearly': 'yearly'
+    }
+    return repeatMap[repeat] || repeat
+  }
+
+  const repeatText = formatRepeat(transaction.repeat)
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -761,13 +776,20 @@ function TransactionItem({
         )}
       </div>
       <div className="flex items-center gap-4">
-        <span
-          className={`text-lg font-bold ${
-            transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-          }`}
-        >
-          {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
-        </span>
+        <div className="flex flex-col items-end">
+          <span
+            className={`text-lg font-bold ${
+              transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {transaction.type === 'income' ? '+' : '-'}${Number(transaction.amount).toFixed(2)}
+          </span>
+          {repeatText && (
+            <span className="text-xl text-navy-500 mt-10">
+              ({repeatText})
+            </span>
+          )}
+        </div>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}

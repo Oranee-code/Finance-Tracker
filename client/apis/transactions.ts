@@ -47,6 +47,7 @@ export async function addTransaction(
     category_name?: string
     transaction_date: string
     notes?: string
+    repeat?: string
   },
   userId: string,
   isGuest: boolean
@@ -67,6 +68,7 @@ export async function updateTransaction(
     category_name?: string
     transaction_date?: string
     notes?: string
+    repeat?: string
   },
   userId: string,
   isGuest: boolean

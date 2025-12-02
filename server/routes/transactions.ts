@@ -58,6 +58,7 @@ router.post('/', async (req, res, next) => {
       category_name,
       transaction_date,
       notes,
+      repeat,
     } = req.body
 
     if (!tracker_id || !type || !amount || !transaction_date) {
@@ -75,6 +76,7 @@ router.post('/', async (req, res, next) => {
       category_name,
       transaction_date,
       notes,
+      repeat: repeat || 'never',
       user_id: userId,
       is_guest: isGuest,
     })

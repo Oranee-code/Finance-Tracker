@@ -9,6 +9,7 @@ export interface Transaction {
   category_name: string | null
   transaction_date: string
   notes: string | null
+  repeat: string | null
   user_id: string
   is_guest: boolean
   created_at: string
@@ -44,6 +45,7 @@ export async function addTransaction(transaction: {
   category_name?: string
   transaction_date: string
   notes?: string
+  repeat?: string
   user_id: string
   is_guest: boolean
 }) {
@@ -63,6 +65,7 @@ export async function updateTransaction(
     category_name?: string
     transaction_date?: string
     notes?: string
+    repeat?: string
   }
 ) {
   return connection('transactions')

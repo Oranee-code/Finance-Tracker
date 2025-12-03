@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Plus, Edit2, Trash2, TrendingUp, TrendingDown, Landmark, CalendarHeart, Wallet, CreditCard, PiggyBank, Briefcase, Home, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign, ChevronDown } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import * as trackerApi from '../apis/trackers.ts'
 import * as transactionApi from '../apis/transactions.ts'
@@ -10,6 +10,10 @@ import * as categoryApi from '../apis/categories.ts'
 import { useUserInfo } from '../hooks/useUserInfo.ts'
 import { format, startOfDay, endOfDay, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subWeeks, addWeeks, addMonths, addDays } from 'date-fns'
 import moneyBg from '../../Image/Money BG2.jpg'
+import { generateTrackerInsights } from '../utils/aiInsights.ts'
+import AIInsightsPanel from './AIInsightsPanel.tsx'
+import { Insight } from '../utils/aiInsights.ts'
+import { slugify } from '../utils/slugify.ts'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#14b8a6']
 
@@ -47,7 +51,7 @@ const TRACKER_COLORS = [
 ]
 
 export default function TrackerDashboard() {
-  const { id } = useParams<{ id: string }>()
+  const { name } = useParams<{ name: string }>()
   const navigate = useNavigate()
   const { userId, isGuest } = useUserInfo()
   const queryClient = useQueryClient()
@@ -69,26 +73,31 @@ export default function TrackerDashboard() {
   const [tempCustomStartDate, setTempCustomStartDate] = useState<string>('')
   const [tempCustomEndDate, setTempCustomEndDate] = useState<string>('')
 
-  const trackerId = Number(id)
-
+  // Get tracker by name (slug)
   const { data: tracker } = useQuery({
-    queryKey: ['tracker', trackerId, userId, isGuest],
-    queryFn: () => trackerApi.getTracker(trackerId, userId, isGuest),
+    queryKey: ['tracker', name, userId, isGuest],
+    queryFn: () => trackerApi.getTrackerByName(name || '', userId, isGuest),
+    enabled: !!name,
   })
+
+  const trackerId = tracker?.id
 
   const { data: transactions = [] } = useQuery({
     queryKey: ['transactions', trackerId, userId, isGuest],
-    queryFn: () => transactionApi.getTransactions(trackerId, userId, isGuest),
+    queryFn: () => transactionApi.getTransactions(trackerId!, userId, isGuest),
+    enabled: !!trackerId,
   })
 
   const { data: summary } = useQuery({
     queryKey: ['summary', trackerId, userId, isGuest],
-    queryFn: () => transactionApi.getTransactionSummary(trackerId, userId, isGuest),
+    queryFn: () => transactionApi.getTransactionSummary(trackerId!, userId, isGuest),
+    enabled: !!trackerId,
   })
 
   const { data: categorySpending = [] } = useQuery({
     queryKey: ['categorySpending', trackerId, userId, isGuest],
-    queryFn: () => transactionApi.getCategorySpending(trackerId, userId, isGuest),
+    queryFn: () => transactionApi.getCategorySpending(trackerId!, userId, isGuest),
+    enabled: !!trackerId,
   })
 
   const { data: categories = [] } = useQuery({
@@ -97,7 +106,7 @@ export default function TrackerDashboard() {
   })
 
   const deleteTrackerMutation = useMutation({
-    mutationFn: () => trackerApi.deleteTracker(trackerId, userId, isGuest),
+    mutationFn: () => trackerApi.deleteTracker(trackerId!, userId, isGuest),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       navigate('/')
@@ -105,11 +114,15 @@ export default function TrackerDashboard() {
   })
 
   const updateTrackerMutation = useMutation({
-    mutationFn: ({ name, icon, color }: { name: string; icon: string; color: string }) => trackerApi.updateTracker(trackerId, name, userId, isGuest, icon || 'Wallet', color || '#7dd3fc'),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tracker', trackerId, userId, isGuest] })
+    mutationFn: ({ name, icon, color }: { name: string; icon: string; color: string }) => trackerApi.updateTracker(trackerId!, name, userId, isGuest, icon || 'Wallet', color || '#7dd3fc'),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['tracker', name, userId, isGuest] })
       queryClient.invalidateQueries({ queryKey: ['trackers', userId, isGuest] })
       setShowEditModal(false)
+      // Redirect to new slugified name if name changed
+      if (variables.name && slugify(variables.name) !== name) {
+        navigate(`/tracker/${slugify(variables.name)}`)
+      }
     },
   })
 
@@ -267,6 +280,27 @@ export default function TrackerDashboard() {
         value: Number(cat.total),
       }))
     : filteredChartData
+
+  // Generate AI insights for this tracker
+  const insights: Insight[] = useMemo(() => {
+    if (!tracker || !summary || categorySpending.length === 0) return []
+    
+    const trackerData = {
+      id: tracker.id,
+      name: tracker.name,
+      summary: {
+        totalIncome: summary.totalIncome || 0,
+        totalExpenses: summary.totalExpenses || 0,
+        balance: summary.balance || 0,
+      },
+      categorySpending: categorySpending,
+    }
+    
+    return generateTrackerInsights(trackerData, categorySpending)
+  }, [tracker, summary, categorySpending])
+
+  // Removed pop-up notifications - they're now on the main dashboard
+  // Keep only the insights panel for tracker-specific insights
 
   if (!tracker) {
     return (
@@ -589,6 +623,13 @@ export default function TrackerDashboard() {
             )}
           </div>
         </div>
+
+        {/* AI Insights Panel - Tracker-specific insights */}
+        {insights.length > 0 && (
+          <AIInsightsPanel
+            insights={insights}
+          />
+        )}
 
         {/* Charts */}
         {chartData.length > 0 && (

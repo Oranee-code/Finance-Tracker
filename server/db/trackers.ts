@@ -23,6 +23,23 @@ export async function getTrackerById(id: number, userId: string, isGuest: boolea
     .first()
 }
 
+export async function getTrackerByName(name: string, userId: string, isGuest: boolean) {
+  // Try exact match first
+  let tracker = await connection('trackers')
+    .where({ name, user_id: userId, is_guest: isGuest })
+    .first()
+  
+  // If not found, try case-insensitive match
+  if (!tracker) {
+    tracker = await connection('trackers')
+      .where({ user_id: userId, is_guest: isGuest })
+      .whereRaw('LOWER(name) = ?', [name.toLowerCase()])
+      .first()
+  }
+  
+  return tracker
+}
+
 export async function addTracker(tracker: {
   name: string
   icon?: string

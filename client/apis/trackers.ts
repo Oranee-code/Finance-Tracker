@@ -18,6 +18,14 @@ export async function getTracker(id: number, userId: string, isGuest: boolean) {
   return res.body
 }
 
+export async function getTrackerByName(name: string, userId: string, isGuest: boolean) {
+  const res = await request
+    .get(`${baseUrl}/${encodeURIComponent(name)}`)
+    .set('X-Guest-Id', userId)
+    .set('X-Is-Guest', isGuest.toString())
+  return res.body
+}
+
 export async function addTracker(
   name: string,
   userId: string,

@@ -23,7 +23,6 @@ const DEFAULT_CATEGORIES = {
     '🏡 Mortgage',
     '💡 Utilities',
     '🚗 Transport',
-    '⛽ Gas',
     '🏋️ Gym',
     '🛍️ Shopping',
     '🍽️ Eating Out',

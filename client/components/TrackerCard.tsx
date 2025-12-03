@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { PieChart as PieChartIcon, Wallet, CreditCard, PiggyBank, Briefcase, Home as HomeIcon, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign } from 'lucide-react'
+import { PieChart as PieChartIcon, Wallet, CreditCard, PiggyBank, Briefcase, Home as HomeIcon, ShoppingBag, Car, Heart, Star, Target, Building2, DollarSign, Sparkles } from 'lucide-react'
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { format } from 'date-fns'
 import * as transactionApi from '../apis/transactions.ts'

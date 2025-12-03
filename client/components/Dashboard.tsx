@@ -4,8 +4,13 @@ import { motion } from 'framer-motion'
 import { Plus, PieChart as PieChartIcon, Wallet } from 'lucide-react'
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts'
 import { format } from 'date-fns'
+import { useState, useEffect } from 'react'
 import * as transactionApi from '../apis/transactions.ts'
 import TrackerCard from './TrackerCard.tsx'
+import { useAIInsights } from '../hooks/useAIInsights.ts'
+import AIInsightsNotification from './AIInsightsNotification.tsx'
+import { Insight } from '../utils/aiInsights.ts'
+import { slugify } from '../utils/slugify.ts'
 
 interface DashboardProps {
   trackers: any[]
@@ -16,9 +21,45 @@ interface DashboardProps {
 
 export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: DashboardProps) {
   const navigate = useNavigate()
+  const { insights, isLoading } = useAIInsights(userId, isGuest)
+  const [currentNotification, setCurrentNotification] = useState<Insight | null>(null)
+  const [dismissedInsights, setDismissedInsights] = useState<Set<string>>(new Set())
+  const [notificationIndex, setNotificationIndex] = useState(0)
+
+  // Show notifications one at a time for general insights across all trackers
+  useEffect(() => {
+    if (insights.length === 0) return
+
+    const visibleInsights = insights.filter(
+      (insight) => !dismissedInsights.has(insight.id)
+    )
+
+    if (visibleInsights.length > 0 && notificationIndex < visibleInsights.length) {
+      setCurrentNotification(visibleInsights[notificationIndex])
+    } else {
+      setCurrentNotification(null)
+    }
+  }, [insights, dismissedInsights, notificationIndex])
+
+  const handleCloseNotification = () => {
+    setCurrentNotification(null)
+    // Don't automatically show next notification - user can view them in individual trackers
+  }
+
+  const handleDismissInsight = (insightId: string) => {
+    setDismissedInsights((prev) => new Set([...prev, insightId]))
+    handleCloseNotification()
+  }
 
   return (
     <>
+      {/* AI Insights Notification - General suggestions based on all trackers */}
+      <AIInsightsNotification
+        insight={currentNotification}
+        onClose={handleCloseNotification}
+        onDismiss={() => currentNotification && handleDismissInsight(currentNotification.id)}
+      />
+
       {/* Header with Add Button */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -53,7 +94,7 @@ export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: D
             index={index}
             userId={userId}
             isGuest={isGuest}
-            onClick={() => navigate(`/tracker/${tracker.id}`)}
+            onClick={() => navigate(`/tracker/${slugify(tracker.name)}`)}
           />
         ))}
       </motion.div>

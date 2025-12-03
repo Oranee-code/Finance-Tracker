@@ -17,7 +17,7 @@ export default createRoutesFromElements(
       }
     >
       <Route index element={<Home />} />
-      <Route path="tracker/:id" element={<TrackerDashboard />} />
+      <Route path="tracker/:name" element={<TrackerDashboard />} />
     </Route>
   </>,
 )

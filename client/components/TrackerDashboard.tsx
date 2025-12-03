@@ -327,40 +327,40 @@ export default function TrackerDashboard() {
         transition={{ duration: 0.5 }}
       >
         {/* Header */}
-        <div className="flex items-center gap-12 mb-8">
+        <div className="flex items-center gap-4 sm:gap-12 mb-6 sm:mb-8">
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => navigate('/')}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 sm:p-1 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.button>
-          <h1 className="text-3xl font-bold text-gray-800 flex-1">{tracker.name}</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 flex-1 truncate">{tracker.name}</h1>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowEditModal(true)}
-            className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors"
+            className="flex items-center gap-1 sm:gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 sm:py-2 px-3 sm:px-4 rounded-lg transition-colors touch-manipulation min-h-[44px] text-sm sm:text-base"
           >
             <Edit2 className="w-4 h-4" />
-            Edit
+            <span className="hidden sm:inline">Edit</span>
           </motion.button>
         </div>
 
         {/* Balance Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-green-50 rounded-lg p-6 border border-green-200"
+            className="bg-green-50 rounded-lg p-4 sm:p-6 border border-green-200"
           >
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
               <h3 className="text-sm font-medium text-green-800">Total Income</h3>
             </div>
-            <p className="text-3xl font-bold text-green-700">
+            <p className="text-2xl sm:text-3xl font-bold text-green-700">
               ${(dateRangeType === 'all' ? summary?.totalIncome : filteredSummary.totalIncome)?.toFixed(2) || '0.00'}
             </p>
           </motion.div>
@@ -406,7 +406,7 @@ export default function TrackerDashboard() {
 
         {/* Add Buttons */}
         <div className="mb-4">
-          <div className="flex gap-4 mb-2">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -414,10 +414,10 @@ export default function TrackerDashboard() {
                 setTransactionType('income')
                 setShowAddModal(true)
               }}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-lg transition-colors touch-manipulation min-h-[44px] w-full sm:w-auto"
             >
-              <Plus className="w-6 h-6" />
-              Add Income
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>Add Income</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -426,10 +426,10 @@ export default function TrackerDashboard() {
                 setTransactionType('expense')
                 setShowAddModal(true)
               }}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-lg transition-colors touch-manipulation min-h-[44px] w-full sm:w-auto"
             >
-              <Plus className="w-6 h-6" />
-              Add Expense
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>Add Expense</span>
             </motion.button>
           </div>
           <div className="mt-4 mb-2">
@@ -633,15 +633,15 @@ export default function TrackerDashboard() {
 
         {/* Charts */}
         {chartData.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 }}
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-4 sm:p-6"
             >
-              <h3 className="text-xl font-semibold mb-4">Spending by Category</h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Spending by Category</h3>
+              <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
                 <PieChart>
                   <Pie
                     data={chartData}
@@ -666,10 +666,10 @@ export default function TrackerDashboard() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-4 sm:p-6"
             >
-              <h3 className="text-xl font-semibold mb-4">Expenses Breakdown</h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Expenses Breakdown</h3>
+              <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
                 <BarChart data={chartData}>
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -687,9 +687,9 @@ export default function TrackerDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-blue-50 rounded-lg shadow-md p-6"
+          className="bg-blue-50 rounded-lg shadow-md p-4 sm:p-6"
         >
-          <h3 className="text-xl font-semibold mb-4">Recent Transactions</h3>
+          <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Recent Transactions</h3>
           {filteredTransactions.length === 0 ? (
             <p className="text-gray-500 text-center py-8">No transactions in selected period</p>
           ) : (

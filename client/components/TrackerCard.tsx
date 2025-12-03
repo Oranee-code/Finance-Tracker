@@ -74,7 +74,7 @@ export default function TrackerCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ scale: 1.02, y: -4 }}
-      className="glass-card glass-card-hover rounded-2xl p-10 cursor-pointer"
+      className="glass-card glass-card-hover rounded-2xl p-6 sm:p-10 cursor-pointer touch-manipulation"
       onClick={onClick}
     >
       {/* Header with name and icon */}
@@ -155,8 +155,8 @@ export default function TrackerCard({
           e.stopPropagation()
           onClick()
         }}
-        className="w-full py-2 text-sm font-medium text-luxury-teal hover:text-luxury-teal/80 border border-luxury-navy 
-        hover:border-luxury-teal/30 rounded-lg transition-colors flex items-center justify-center gap-1 mb-3"
+        className="w-full py-3 sm:py-2 text-sm font-medium text-luxury-teal hover:text-luxury-teal/80 border border-luxury-navy 
+        hover:border-luxury-teal/30 rounded-lg transition-colors flex items-center justify-center gap-1 mb-3 touch-manipulation min-h-[44px]"
       >
         + Add Transaction
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

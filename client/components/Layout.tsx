@@ -8,22 +8,22 @@ export default function Layout() {
 
   return (
     <>
-      <header className="bg-blue-50 shadow-sm border-b border-blue-100">
+      <header className="bg-blue-50 shadow-sm border-b border-blue-100 safe-area-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-3 sm:py-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/')}
-              className="flex items-center gap-3"
+              className="flex items-center gap-2 sm:gap-3 touch-manipulation"
             >
               <img
                 src={logo}
                 alt="Money Tracker Logo"
-                className="h-12 w-auto cursor-pointer"
+                className="h-8 sm:h-12 w-auto cursor-pointer"
               />
             </motion.button>
-            <h3 className="text-sm text-gray-500"> Smart Money Management Simple Tracking</h3>
+            <h3 className="text-xs sm:text-sm text-gray-500 text-center flex-1 mx-2 truncate">Smart Money Management</h3>
             <LogoutButton />
           </div>
         </div>

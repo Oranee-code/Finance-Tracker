@@ -23,32 +23,18 @@ export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: D
   const navigate = useNavigate()
   const { insights, isLoading } = useAIInsights(userId, isGuest)
   const [currentNotification, setCurrentNotification] = useState<Insight | null>(null)
-  const [dismissedInsights, setDismissedInsights] = useState<Set<string>>(new Set())
-  const [notificationIndex, setNotificationIndex] = useState(0)
 
-  // Show notifications one at a time for general insights across all trackers
+  // Show first notification if available
   useEffect(() => {
-    if (insights.length === 0) return
-
-    const visibleInsights = insights.filter(
-      (insight) => !dismissedInsights.has(insight.id)
-    )
-
-    if (visibleInsights.length > 0 && notificationIndex < visibleInsights.length) {
-      setCurrentNotification(visibleInsights[notificationIndex])
+    if (insights.length > 0) {
+      setCurrentNotification(insights[0])
     } else {
       setCurrentNotification(null)
     }
-  }, [insights, dismissedInsights, notificationIndex])
+  }, [insights])
 
   const handleCloseNotification = () => {
     setCurrentNotification(null)
-    // Don't automatically show next notification - user can view them in individual trackers
-  }
-
-  const handleDismissInsight = (insightId: string) => {
-    setDismissedInsights((prev) => new Set([...prev, insightId]))
-    handleCloseNotification()
   }
 
   return (
@@ -57,7 +43,6 @@ export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: D
       <AIInsightsNotification
         insight={currentNotification}
         onClose={handleCloseNotification}
-        onDismiss={() => currentNotification && handleDismissInsight(currentNotification.id)}
       />
 
       {/* Header with Add Button */}
@@ -65,16 +50,16 @@ export default function Dashboard({ trackers, userId, isGuest, onAddTracker }: D
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex justify-between items-center mb-6"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-4 sm:px-0"
       >
-        <h1 className="text-4xl font-sans font-bold text-blue-500 ml-8 -mt-10">
+        <h1 className="text-2xl sm:text-4xl font-sans font-bold text-blue-500 sm:ml-8 sm:-mt-10">
           Your Dashboard
         </h1>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onAddTracker}
-          className="flex items-center gap-2 luxury-btn text-white font-semibold py-4 px-6 rounded-xl relative z-10"
+          className="flex items-center gap-2 luxury-btn text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl relative z-10 touch-manipulation w-full sm:w-auto justify-center"
         >
           <Plus className="w-5 h-5 relative z-10" />
           <span className="relative z-10">Add Tracker</span>

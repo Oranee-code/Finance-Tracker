@@ -5,13 +5,11 @@ import { Insight } from '../utils/aiInsights.ts'
 interface AIInsightsNotificationProps {
   insight: Insight | null
   onClose: () => void
-  onDismiss?: () => void
 }
 
 export default function AIInsightsNotification({
   insight,
   onClose,
-  onDismiss,
 }: AIInsightsNotificationProps) {
   const getIcon = () => {
     if (!insight) return null
@@ -69,7 +67,7 @@ export default function AIInsightsNotification({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 30 }}
-          className={`fixed top-4 right-4 z-50 max-w-md w-full ${getBgColor()} border-2 rounded-xl shadow-2xl p-4`}
+          className={`fixed top-4 right-4 left-4 sm:left-auto sm:max-w-md z-50 w-auto sm:w-full ${getBgColor()} border-2 rounded-xl shadow-2xl p-4 touch-manipulation`}
         >
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-1">{getIcon()}</div>
@@ -80,7 +78,7 @@ export default function AIInsightsNotification({
               </h3>
               <button
                 onClick={onClose}
-                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -113,14 +111,6 @@ export default function AIInsightsNotification({
               <p className={`text-xs mt-2 ${getTextColor()} opacity-75`}>
                 Tracker: {insight.trackerName}
               </p>
-            )}
-            {onDismiss && (
-              <button
-                onClick={onDismiss}
-                className={`mt-3 text-xs ${getTextColor()} opacity-75 hover:opacity-100 underline transition-opacity`}
-              >
-                Don't show again
-              </button>
             )}
           </div>
         </div>

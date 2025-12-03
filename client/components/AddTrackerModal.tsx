@@ -68,9 +68,9 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-card rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
+        className="glass-card rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
       >
-        <h2 className="text-2xl font-serif font-semibold text-luxury-navy mb-6">
+        <h2 className="text-xl sm:text-2xl font-serif font-semibold text-luxury-navy mb-4 sm:mb-6">
           Create New Tracker
         </h2>
         <form onSubmit={handleSubmit}>
@@ -79,7 +79,7 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
             value={trackerName}
             onChange={(e) => setTrackerName(e.target.value)}
             placeholder="e.g., Personal, Business, Savings..."
-            className="w-full px-4 py-3 border border-luxury-beige rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-luxury-teal/50 focus:border-luxury-teal bg-white/80 text-luxury-navy placeholder:text-luxury-navy/40"
+            className="w-full px-4 py-3 border border-luxury-beige rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-luxury-teal/50 focus:border-luxury-teal bg-white/80 text-luxury-navy placeholder:text-luxury-navy/40 text-base"
             autoFocus
           />
           
@@ -88,7 +88,7 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
             <label className="block text-sm font-medium text-luxury-navy mb-3">
               Icon
             </label>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {TRACKER_ICONS.map((icon) => {
                 const IconComponent = icon.component
                 const isSelected = selectedIcon === icon.name
@@ -101,7 +101,7 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
                       e.stopPropagation()
                       setSelectedIcon(icon.name)
                     }}
-                    className={`p-3 rounded-xl border-2 transition-all cursor-pointer relative z-10 min-w-[48px] min-h-[48px] flex items-center justify-center ${
+                    className={`p-2 sm:p-3 rounded-xl border-2 transition-all cursor-pointer relative z-10 min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px] flex items-center justify-center touch-manipulation ${
                       isSelected
                         ? 'border-luxury-teal bg-luxury-teal/20 shadow-md'
                         : 'border-luxury-beige hover:border-luxury-teal/50 hover:bg-luxury-beige/50'
@@ -121,7 +121,7 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
             <label className="block text-sm font-medium text-luxury-navy mb-3">
               Color
             </label>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {TRACKER_COLORS.map((color) => {
                 const isSelected = selectedColor === color.value
                 return (
@@ -133,7 +133,7 @@ export default function AddTrackerModal({ isOpen, onClose, onSubmit, isLoading =
                       e.stopPropagation()
                       setSelectedColor(color.value)
                     }}
-                    className={`w-10 h-10 rounded-lg border-2 transition-all cursor-pointer relative z-10 ${
+                    className={`w-10 h-10 rounded-lg border-2 transition-all cursor-pointer relative z-10 touch-manipulation min-w-[44px] min-h-[44px] ${
                       isSelected
                         ? 'border-luxury-navy shadow-lg scale-110'
                         : 'border-luxury-beige hover:border-luxury-navy/50 hover:scale-105'

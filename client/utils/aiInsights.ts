@@ -595,8 +595,10 @@ export function generateInsights(
           id: `${categoryType}-exceeds-all`,
           type: 'warning',
           title: `${recommendation.name} Exceeds Recommendation`,
-          message: `You're spending $${total.toFixed(2)} (${percentageOfIncome.toFixed(1)}% of income) on ${recommendation.name.toLowerCase()}, 
-          which exceeds the recommended ${recommendation.max}%. Recommended range is ${recommendation.min}-${recommendation.max}% of income. 
+          message: `You're spending $${total.toFixed(2)} (${percentageOfIncome.toFixed(1)}% of income) 
+          on ${recommendation.name.toLowerCase()}, 
+          which exceeds the recommended ${recommendation.max}%. 
+          Recommended range is ${recommendation.min}-${recommendation.max}% of income. 
           You're spending ${excess.toFixed(1)}% more than recommended.`,
           trackerId: tracker?.id,
           trackerName: tracker?.name,
@@ -614,7 +616,8 @@ export function generateInsights(
       id: 'negative-balance',
       type: 'warning',
       title: 'Negative Balance Alert',
-      message: `Your total balance is negative ($${Math.abs(totalBalance).toFixed(2)}). You're spending more than you're earning. Consider reviewing your expenses and finding areas to cut back.`,
+      message: `Your total balance is negative ($${Math.abs(totalBalance).toFixed(2)}).
+       You're spending more than you're earning. Consider reviewing your expenses and finding areas to cut back.`,
       percentage: Math.abs((totalBalance / totalIncome) * 100),
       priority: 'high',
     })

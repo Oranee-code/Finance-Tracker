@@ -8,7 +8,6 @@ const SAMPLE_CHART_DATA = [
   { name: '20% Groceries', value: 20, color: '#0d9488' },
   { name: '18% Utilities', value: 18, color: '#bae6fd' },
   { name: '10% Dining Out', value: 10, color: '#3b82f6' },
-
   { name: '12% Savings', value: 12, color: '#7dd3fc' },
 ]
 
@@ -46,7 +45,7 @@ export default function LandingPage({ onCreateTracker }: LandingPageProps) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onCreateTracker}
-              className="luxury-btn text-white font-semibold py-5 px-10 rounded-xl text-base flex items-center gap-4 relative z-10"
+              className="luxury-btn text-white font-semibold py-6 px-14 rounded-xl text-base flex items-center gap-4 relative z-10"
             >
               <motion.span
                 animate={{ rotate: [0, 45, -45, 0] }}
@@ -55,7 +54,7 @@ export default function LandingPage({ onCreateTracker }: LandingPageProps) {
                 <Sparkles className="w-6 h-6 relative z-10" />
               </motion.span>
               
-              <span className="relative z-10 text-lg">
+              <span className="relative z-10 text-base sm:text-lg">
                 Create Your First Tracker
               </span>
               <motion.span
@@ -110,7 +109,7 @@ export default function LandingPage({ onCreateTracker }: LandingPageProps) {
               <p className="text-xl text-luxury-navy/50 font-medium uppercase tracking-wider mb-2 text-center">
                 Spending by Category
               </p>
-              <div className="flex items-center justify-center gap-16">
+              <div className="flex items-center justify-center gap-6">
                 {/* Donut Chart */}
                 <div className="h-28 w-28 flex-shrink-0">
                   <ResponsiveContainer width="100%" height="100%">

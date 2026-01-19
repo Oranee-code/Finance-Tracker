@@ -1,6 +1,6 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import { Navigate } from 'react-router-dom'
 import Login from './Login'
+import { useAuth } from './AuthContext.tsx'
 import { useGuestAuth } from './GuestAuthContext.tsx'
 
 interface ProtectedRouteProps {
@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth0()
+  const { isAuthenticated, isLoading } = useAuth()
   const { isGuest } = useGuestAuth()
 
   if (isLoading) {
@@ -22,7 +22,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  // Allow access if authenticated via Auth0 OR signed in as guest
+  // Allow access if authenticated via email/password OR signed in as guest
   if (!isAuthenticated && !isGuest) {
     return <Login />
   }

@@ -1,45 +1,64 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from './AuthContext.tsx'
 import { useGuestAuth } from './GuestAuthContext.tsx'
 
 export default function Login() {
-  const { loginWithRedirect, isLoading, error, isAuthenticated } = useAuth0()
+  const { login, register, isAuthenticated, isLoading: authLoading } = useAuth()
   const { signInAsGuest, hasPreviousGuestData } = useGuestAuth()
   const navigate = useNavigate()
+  const [isLogin, setIsLogin] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (error) {
-    
-      console.error('Auth0 Error:', error)
-      setErrorMessage(error.message || 'An error occurred during authentication')
-    }
-  }, [error])
-
-  // Redirect to home if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/')
     }
-  }, [isAuthenticated, navigate]) 
+  }, [isAuthenticated, navigate])
 
-  const handleLogin = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     setErrorMessage('')
-    loginWithRedirect({
-      appState: {
-        returnTo: window.location.pathname || '/',
-      },
-    }).catch((err) => {
-      console.error('Login error:', err)
-      setErrorMessage(err.message || 'Failed to redirect to login')
-    })
+    setIsSubmitting(true)
+
+    try {
+      if (isLogin) {
+        await login(email, password)
+      } else {
+        if (!name.trim()) {
+          setErrorMessage('Name is required')
+          setIsSubmitting(false)
+          return
+        }
+        await register(email, password, name)
+      }
+      navigate('/')
+    } catch (err: any) {
+      setErrorMessage(err.response?.body?.message || err.message || 'An error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleGuestLogin = (restorePrevious = true) => {
     signInAsGuest(restorePrevious)
     navigate('/')
+  }
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -55,7 +74,7 @@ export default function Login() {
             Finance Tracker
           </h1>
           <p className="text-gray-600">
-            Sign in to manage your finances
+            {isLogin ? 'Sign in to manage your finances' : 'Create an account to get started'}
           </p>
         </div>
 
@@ -65,22 +84,84 @@ export default function Login() {
           </div>
         )}
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleLogin}
-          disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mb-3 flex items-center justify-center gap-2"
-        >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Loading...
-            </>
-          ) : (
-            'Sign In with Auth0'
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Your name"
+                required={!isLogin}
+              />
+            </div>
           )}
-        </motion.button>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="your@email.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                {isLogin ? 'Signing in...' : 'Creating account...'}
+              </>
+            ) : (
+              isLogin ? 'Sign In' : 'Create Account'
+            )}
+          </motion.button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsLogin(!isLogin)
+              setErrorMessage('')
+            }}
+            className="text-sm text-indigo-600 hover:text-indigo-700"
+          >
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          </button>
+        </div>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -91,48 +172,15 @@ export default function Login() {
           </div>
         </div>
 
-        {hasPreviousGuestData ? (
-          <>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleGuestLogin(true)}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 mb-2"
-            >
-              Continue as Guest (Restore Data)
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleGuestLogin(false)}
-              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
-            >
-              Start New Guest Session
-            </motion.button>
-          </>
-        ) : (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleGuestLogin(false)}
-            className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
-          >
-            Sign In as Guest
-          </motion.button>
-        )}
-
-        <p className="text-sm text-gray-500 text-center mt-6">
-          {hasPreviousGuestData
-            ? 'Your previous guest data will be restored when you continue'
-            : 'Guest mode allows you to use the app without creating an account'}
-        </p>
-        
-        <div className="mt-4 text-xs text-gray-400 text-center">
-          <p>For secure authentication, use Auth0</p>
-          <p className="mt-1 text-gray-300">Callback URL: {window.location.origin}</p>
-        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => handleGuestLogin(true)}
+          className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+        >
+          Sign In as Guest
+        </motion.button>
       </motion.div>
     </div>
   )
 }
-

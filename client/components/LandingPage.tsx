@@ -8,7 +8,7 @@ const SAMPLE_CHART_DATA = [
   { name: '20% Groceries', value: 20, color: '#0d9488' },
   { name: '18% Utilities', value: 18, color: '#bae6fd' },
   { name: '10% Dining Out', value: 10, color: '#3b82f6' },
-  { name: '5% Entertainment', value: 5, color: '#2d4a6f' },
+
   { name: '12% Savings', value: 12, color: '#7dd3fc' },
 ]
 
@@ -134,7 +134,7 @@ export default function LandingPage({ onCreateTracker }: LandingPageProps) {
                 {/* percentage labels - Right side */}
                 <div className="flex flex-col gap-2">
                   {SAMPLE_CHART_DATA.map((item: any, index: number) => (
-                    <div key={index} className="flex items-center gap-8">
+                    <div key={index} className="flex items-center gap-2">
                       <div 
                         className="w-3 h-3 rounded-full" 
                         style={{ backgroundColor: item.color }}

@@ -1,5 +1,7 @@
 import { Request } from 'express'
-import { JwtRequest } from './auth0.ts'
+import jwt from 'jsonwebtoken'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 
 export function getUserId(req: Request): { userId: string; isGuest: boolean } {
   // Check if it's a guest user (from headers)
@@ -11,10 +13,15 @@ export function getUserId(req: Request): { userId: string; isGuest: boolean } {
     return { userId: guestId, isGuest: true }
   }
 
-  // Check for Auth0 user (if JWT is present)
-  const authReq = req as JwtRequest
-  if (authReq.auth?.sub) {
-    return { userId: authReq.auth.sub, isGuest: false }
+  // Check for authenticated user (JWT token in cookie)
+  const token = req.cookies?.authToken
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; email: string }
+      return { userId: String(decoded.userId), isGuest: false }
+    } catch (err) {
+      // Token is invalid, continue to check guest or throw error
+    }
   }
 
   // For development: if no auth and no guest headers, throw a more helpful error
@@ -22,7 +29,7 @@ export function getUserId(req: Request): { userId: string; isGuest: boolean } {
     console.warn('No user ID found. Headers:', {
       'x-is-guest': req.headers['x-is-guest'],
       'x-guest-id': req.headers['x-guest-id'],
-      'auth': authReq.auth,
+      'has-token': !!token,
     })
   }
 

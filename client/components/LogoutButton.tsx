@@ -1,27 +1,15 @@
-import { useAuth0 } from '@auth0/auth0-react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { CircleUserRound } from 'lucide-react'
+import { useAuth } from './AuthContext.tsx'
 import { useGuestAuth } from './GuestAuthContext.tsx'
 import GuestProfileModal from './GuestProfileModal.tsx'
+import UserProfileModal from './UserProfileModal.tsx'
 
 export default function LogoutButton() {
-  const { logout, user, isAuthenticated } = useAuth0()
+  const { user, isAuthenticated } = useAuth()
   const { isGuest, guestUser } = useGuestAuth()
-  const navigate = useNavigate()
   const [showProfileModal, setShowProfileModal] = useState(false)
-
-  const handleLogout = () => {
-    if (isAuthenticated) {
-      // Auth0 logout
-      logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        },
-      })
-    }
-  }
 
   const displayName = isAuthenticated
     ? user?.name || user?.email
@@ -36,38 +24,28 @@ export default function LogoutButton() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              if (isGuest) {
-                setShowProfileModal(true)
-              }
-            }}
-            className={`flex items-center gap-2 text-sm font-medium transition-colors text-black ${
-              isGuest ? 'cursor-pointer hover:text-gray-300' : 'cursor-default'
-            }`}
-            title={isGuest ? 'Click to open profile' : undefined}
+            onClick={() => setShowProfileModal(true)}
+            className="flex items-center gap-2 text-sm font-medium transition-colors text-black hover:text-gray-600 cursor-pointer"
+            title="Click to open profile"
           >
             <CircleUserRound className="w-8 h-8" />
             {displayName}
             {isGuest && (
-              <span className="ml-2 text-xs text-gray-300">(Guest)</span>
+              <span className="ml-2 text-xs text-gray-500">(Guest)</span>
             )}
-          </motion.button>
-        )}
-        {!isGuest && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-black font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-            title="Logout"
-          >
-            Logout
           </motion.button>
         )}
       </div>
 
       {isGuest && (
         <GuestProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
+
+      {isAuthenticated && (
+        <UserProfileModal
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
         />
